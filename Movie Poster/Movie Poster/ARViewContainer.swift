@@ -146,10 +146,18 @@ struct ARViewContainer: UIViewRepresentable {
             // 즉, 별도의 UIImage나 텍스처 변환 없이 영상이 ModelEntity에 표시됩니다.
             let videoMaterial = VideoMaterial(avPlayer: avPlayer)
 
-            // 포스터와 같은 가로·세로 크기의 얇은 3D Box를 영상 스크린으로 사용합니다.
-            // 두께를 아주 작게 주면 한쪽 면 방향 문제를 줄이고 영상이 안정적으로 보입니다.
-            let videoMesh = MeshResource.generateBox(width: width, height: height, depth: 0.001)
+            // 영상은 3D 상자가 아니라 세로로 세운 평면 하나에만 표시해야 합니다.
+            // Box를 사용하면 VideoMaterial이 6개 면에 모두 적용됩니다.
+            // 그 결과 휴대폰을 아래에서 위로 기울였을 때 상단 면이 천장처럼 보입니다.
+            // generatePlane은 기본적으로 바닥을 향하므로 x축으로 90도 회전시켜 세웁니다.
+            let videoMesh = MeshResource.generatePlane(width: width, depth: height)
             let videoEntity = ModelEntity(mesh: videoMesh, materials: [videoMaterial])
+            videoEntity.orientation = simd_quatf(
+                angle: .pi / 2,
+                axis: SIMD3<Float>(1, 0, 0)
+            )
+
+            // 영상 평면을 포스터 안쪽으로 이동합니다.
             videoEntity.position.z = -depth
 
             // 프레임과 영상 화면을 포털 앵커의 자식으로 연결합니다.
