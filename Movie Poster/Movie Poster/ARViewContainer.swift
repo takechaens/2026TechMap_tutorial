@@ -111,12 +111,10 @@ struct ARViewContainer: UIViewRepresentable {
             let width = Float(size.width)
             let height = Float(size.height)
 
-            // RealityKit의 카메라 기준으로 음수 z 방향은 포스터 안쪽입니다.
-            // 따라서 영상 화면을 -0.15m 뒤로 보내 깊이감을 만듭니다.
-            let depth: Float = 0.15
-
-            // 포털 가장자리에 보이는 검은색 프레임의 두께입니다.
-            let frameThickness: Float = 0.012
+            // 이미지 앵커에서 포스터 면은 x-z 평면입니다.
+            // x = 가로, z = 세로, y = 포스터 앞/뒤 깊이 방향입니다.
+            // 포털의 안쪽은 -y 방향으로 뻗게 만듭니다.
+            let depth: Float = 0.20
 
             // AnchorEntity는 ARImageAnchor의 위치·회전·추적 상태를 따라갑니다.
             // 여기에 자식 Entity를 넣으면 포스터에 붙어 있는 것처럼 움직입니다.
@@ -126,18 +124,56 @@ struct ARViewContainer: UIViewRepresentable {
             // 학습 단계에서 포털 테두리를 눈으로 확인할 수 있도록
             // 여기서는 검은색 SimpleMaterial을 사용합니다.
             let frameMaterial = SimpleMaterial(color: .black, isMetallic: false)
-            let leftFrame = makeBox(width: frameThickness, height: height, depth: depth,
-                                    position: [-width / 2 - frameThickness / 2, 0, -depth / 2],
-                                    material: frameMaterial)
-            let rightFrame = makeBox(width: frameThickness, height: height, depth: depth,
-                                     position: [width / 2 + frameThickness / 2, 0, -depth / 2],
-                                     material: frameMaterial)
-            let topFrame = makeBox(width: width, height: frameThickness, depth: depth,
-                                   position: [0, height / 2 + frameThickness / 2, -depth / 2],
-                                   material: frameMaterial)
-            let bottomFrame = makeBox(width: width, height: frameThickness, depth: depth,
-                                      position: [0, -height / 2 - frameThickness / 2, -depth / 2],
-                                      material: frameMaterial)
+
+            // 관람자 쪽으로 갈수록 벽이 바깥으로 벌어지는 거리입니다.
+            // 뒤쪽 모서리는 영상 화면에 정확히 붙고, 앞쪽 모서리만 확장됩니다.
+            let flare: Float = 0.10
+
+            // 네 패널은 모두 같은 뒤쪽 네 모서리에서 시작합니다.
+            // 그래서 영상 화면과 벽 사이에 틈이 생기지 않습니다.
+            let backY = -depth
+            let frontY: Float = 0
+            let backHalfWidth = width / 2
+            let backHalfHeight = height / 2
+            let frontHalfWidth = backHalfWidth + flare
+            let frontHalfHeight = backHalfHeight + flare
+
+            let leftFrame = makePanel(
+                corners: [
+                    [-backHalfWidth, backY, -backHalfHeight],
+                    [-frontHalfWidth, frontY, -frontHalfHeight],
+                    [-frontHalfWidth, frontY, frontHalfHeight],
+                    [-backHalfWidth, backY, backHalfHeight]
+                ],
+                material: frameMaterial
+            )
+            let rightFrame = makePanel(
+                corners: [
+                    [backHalfWidth, backY, -backHalfHeight],
+                    [backHalfWidth, backY, backHalfHeight],
+                    [frontHalfWidth, frontY, frontHalfHeight],
+                    [frontHalfWidth, frontY, -frontHalfHeight]
+                ],
+                material: frameMaterial
+            )
+            let topFrame = makePanel(
+                corners: [
+                    [-backHalfWidth, backY, backHalfHeight],
+                    [-frontHalfWidth, frontY, frontHalfHeight],
+                    [frontHalfWidth, frontY, frontHalfHeight],
+                    [backHalfWidth, backY, backHalfHeight]
+                ],
+                material: frameMaterial
+            )
+            let bottomFrame = makePanel(
+                corners: [
+                    [-backHalfWidth, backY, -backHalfHeight],
+                    [backHalfWidth, backY, -backHalfHeight],
+                    [frontHalfWidth, frontY, -frontHalfHeight],
+                    [-frontHalfWidth, frontY, -frontHalfHeight]
+                ],
+                material: frameMaterial
+            )
 
             // AVPlayer는 영상 파일을 읽고 재생하는 객체입니다.
             let avPlayer = AVPlayer(url: videoURL)
@@ -146,25 +182,59 @@ struct ARViewContainer: UIViewRepresentable {
             // 즉, 별도의 UIImage나 텍스처 변환 없이 영상이 ModelEntity에 표시됩니다.
             let videoMaterial = VideoMaterial(avPlayer: avPlayer)
 
-            // 영상은 3D 상자가 아니라 세로로 세운 평면 하나에만 표시해야 합니다.
-            // Box를 사용하면 VideoMaterial이 6개 면에 모두 적용됩니다.
-            // 그 결과 휴대폰을 아래에서 위로 기울였을 때 상단 면이 천장처럼 보입니다.
-            // generatePlane은 기본적으로 바닥을 향하므로 x축으로 90도 회전시켜 세웁니다.
-            let videoMesh = MeshResource.generatePlane(width: width, depth: height)
-            let videoEntity = ModelEntity(mesh: videoMesh, materials: [videoMaterial])
-            videoEntity.orientation = simd_quatf(
-                angle: .pi / 2,
-                axis: SIMD3<Float>(1, 0, 0)
+            // 영상 원본의 가로세로 비율을 읽습니다.
+            // 포스터 비율과 다르더라도 영상을 찌그러뜨리지 않기 위해 사용합니다.
+            let videoAspectRatio = videoAspectRatio(for: videoURL)
+            let posterAspectRatio = width / height
+            let screenWidth: Float
+            let screenHeight: Float
+
+            // 영상을 포스터 안에 완전히 들어오도록 aspect fit 합니다.
+            // 남는 공간은 포스터와 프레임의 검은 영역으로 보입니다.
+            if videoAspectRatio > posterAspectRatio {
+                screenWidth = width
+                screenHeight = width / videoAspectRatio
+            } else {
+                screenHeight = height
+                screenWidth = height * videoAspectRatio
+            }
+
+            // 영상은 3D 상자가 아니라 세로 면 하나에만 표시해야 합니다.
+            // 기본 Box는 6개 면을 가지므로 위쪽 면이 천장처럼 보일 수 있습니다.
+            // 네 꼭짓점을 직접 지정해 x-z 평면에 단 하나의 면만 만듭니다.
+            guard let videoMesh = makeVerticalVideoMesh(width: screenWidth, height: screenHeight) else {
+                print("영상 화면 Mesh를 만들 수 없습니다.")
+                return false
+            }
+
+            // 포스터 전체 크기의 검은 배경을 영상 뒤에 배치합니다.
+            // 영상 비율이 포스터보다 가로로 길면 이 배경의 위·아래가
+            // 검은 레터박스가 되어 실제 포스터가 보이지 않습니다.
+            guard let backgroundMesh = makeVerticalVideoMesh(width: width, height: height) else {
+                print("영상 배경 Mesh를 만들 수 없습니다.")
+                return false
+            }
+            let backgroundMaterial = SimpleMaterial(color: .black, isMetallic: false)
+            let backgroundEntity = ModelEntity(
+                mesh: backgroundMesh,
+                materials: [backgroundMaterial]
             )
 
-            // 영상 평면을 포스터 안쪽으로 이동합니다.
-            videoEntity.position.z = -depth
+            // 프레임의 가장 안쪽, 포스터에 맞닿는 위치입니다.
+            backgroundEntity.position.y = -depth + 0.001
+
+            let videoEntity = ModelEntity(mesh: videoMesh, materials: [videoMaterial])
+
+            // 영상도 포털 안쪽 끝에 배치합니다.
+            // 배경보다 2mm 앞에 두어 영상이 검은 배경 위에 보이게 합니다.
+            videoEntity.position.y = -depth + 0.003
 
             // 프레임과 영상 화면을 포털 앵커의 자식으로 연결합니다.
             anchorEntity.addChild(leftFrame)
             anchorEntity.addChild(rightFrame)
             anchorEntity.addChild(topFrame)
             anchorEntity.addChild(bottomFrame)
+            anchorEntity.addChild(backgroundEntity)
             anchorEntity.addChild(videoEntity)
 
             // 만든 앵커를 RealityKit 장면에 추가해야 실제 화면에 렌더링됩니다.
@@ -177,13 +247,82 @@ struct ARViewContainer: UIViewRepresentable {
             return true
         }
 
-        // 프레임을 만드는 반복 코드를 줄이기 위한 보조 함수입니다.
-        private func makeBox(width: Float, height: Float, depth: Float,
-                             position: SIMD3<Float>, material: SimpleMaterial) -> ModelEntity {
-            let mesh = MeshResource.generateBox(width: width, height: height, depth: depth)
-            let entity = ModelEntity(mesh: mesh, materials: [material])
-            entity.position = position
-            return entity
+        // 네 꼭짓점을 연결한 벽 패널을 만듭니다.
+        // 앞·뒤 양쪽 방향에서 보이도록 삼각형의 앞뒤 면을 모두 추가합니다.
+        private func makePanel(
+            corners: [SIMD3<Float>],
+            material: SimpleMaterial
+        ) -> ModelEntity {
+            var descriptor = MeshDescriptor()
+            descriptor.positions = MeshBuffer(corners)
+            let normal = simd_normalize(
+                simd_cross(corners[1] - corners[0], corners[2] - corners[0])
+            )
+            descriptor.normals = MeshBuffer(Array(repeating: normal, count: corners.count))
+            descriptor.primitives = .triangles([
+                0, 1, 2, 0, 2, 3,
+                2, 1, 0, 3, 2, 0
+            ])
+
+            let mesh = (try? MeshResource.generate(from: [descriptor]))
+                ?? MeshResource.generateBox(width: 0.001, height: 0.001, depth: 0.001)
+            return ModelEntity(mesh: mesh, materials: [material])
+        }
+
+        // x-z 평면에 영상 표면 하나만 생성합니다.
+        // y 값은 모두 0이므로 이 Mesh에는 천장이나 바닥 면이 없습니다.
+        private func makeVerticalVideoMesh(width: Float, height: Float) -> MeshResource? {
+            let halfWidth = width / 2
+            let halfHeight = height / 2
+
+            // 앞면 4개와 뒷면 4개를 따로 만듭니다.
+            // 이렇게 하면 카메라가 어느 쪽에 있든 영상이 보입니다.
+            let frontPositions: [SIMD3<Float>] = [
+                [-halfWidth, 0, -halfHeight],
+                [ halfWidth, 0, -halfHeight],
+                [ halfWidth, 0,  halfHeight],
+                [-halfWidth, 0,  halfHeight]
+            ]
+            let positions = frontPositions + frontPositions
+
+            // 앞면은 +y, 뒷면은 -y 방향의 법선을 사용합니다.
+            // ARKit 이미지 앵커의 앞뒤 방향이 기기·자세에 따라 달라도
+            // 한쪽 면이 항상 카메라를 향하게 됩니다.
+            let normals = Array(repeating: SIMD3<Float>(0, 1, 0), count: 4)
+                + Array(repeating: SIMD3<Float>(0, -1, 0), count: 4)
+            let frontTextureCoordinates: [SIMD2<Float>] = [
+                [0, 1], [1, 1], [1, 0], [0, 0]
+            ]
+            let textureCoordinates = frontTextureCoordinates + frontTextureCoordinates
+
+            var descriptor = MeshDescriptor()
+            descriptor.positions = MeshBuffer(positions)
+            descriptor.normals = MeshBuffer(normals)
+            descriptor.textureCoordinates = MeshBuffer(textureCoordinates)
+            // 앞면과 뒷면을 모두 삼각형 2개로 그립니다.
+            descriptor.primitives = .triangles([
+                0, 1, 2, 0, 2, 3,
+                4, 6, 5, 4, 7, 6
+            ])
+
+            return try? MeshResource.generate(from: [descriptor])
+        }
+
+        // AVAsset에서 영상의 실제 표시 비율을 계산합니다.
+        // preferredTransform까지 적용해야 세로로 촬영된 영상도 올바르게 계산됩니다.
+        private func videoAspectRatio(for url: URL) -> Float {
+            let asset = AVURLAsset(url: url)
+            guard let track = asset.tracks(withMediaType: .video).first else {
+                return 1
+            }
+
+            let transformedRect = CGRect(origin: .zero, size: track.naturalSize)
+                .applying(track.preferredTransform)
+            let videoWidth = abs(transformedRect.width)
+            let videoHeight = abs(transformedRect.height)
+
+            guard videoHeight > 0 else { return 1 }
+            return Float(videoWidth / videoHeight)
         }
     }
 }
