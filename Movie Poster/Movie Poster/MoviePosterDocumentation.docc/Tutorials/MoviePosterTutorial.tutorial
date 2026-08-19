@@ -1,200 +1,297 @@
 @Tutorial(time: 30) {
     @Intro(title: "포스터 안에 영화 예고편 열기") {
-        카메라로 영화 포스터를 인식하고, 포스터 위치에 깊이감 있는 3D 영화관 포털과 일반 Video 예고편을 배치합니다.
-
-        이 튜토리얼은 Spatial Video가 아니라 일반 2D Video를 사용합니다.
+        카메라로 영화 포스터를 인식하고, 포스터 위치에 깊이감 있는 3D 영화관 포털과 2D Video 예고편을 배치합니다.
     }
 
     @Section(title: "1. AR 화면 준비하기") {
+        @ContentAndMedia {
+            SwiftUI 화면에 RealityKit의 ARView를 연결해 AR 카메라 화면을 준비합니다.
+
+            @Image(source: "01-swiftui-arview.svg", alt: "SwiftUI와 ARView를 연결하는 구조")
+        }
+
         @Steps {
             @Step {
-                SwiftUI에서 RealityKit의 `ARView`를 사용하려면 `UIViewRepresentable`로 감쌉니다.
+                SwiftUI에서 RealityKit의 `ARView`를 사용하려면 `UIViewRepresentable`로 감쌉니다. `ARView`는 카메라 영상과 3D 콘텐츠를 보여주는 UIKit 뷰이고, `UIViewRepresentable`은 UIKit 뷰를 SwiftUI 화면에 넣어주는 다리입니다.
 
-                ```swift
-                struct ARViewContainer: UIViewRepresentable {
-                    func makeUIView(context: Context) -> ARView {
-                        ARView(frame: .zero)
-                    }
+                처음에는 어려워 보여도 지금 단계에서는 ARKit 코드를 모두 이해할 필요가 없습니다. 먼저 “SwiftUI 화면 안에 ARView를 하나 놓는다”는 구조만 기억하면 됩니다.
 
-                    func updateUIView(_ uiView: ARView, context: Context) {}
-                }
-                ```
+                @Image(source: "01-swiftui-arview.svg", alt: "SwiftUI 화면에 연결된 AR 카메라 화면")
+                @Code(name: "ARViewContainer.swift", file: "ARViewContainer.swift")
             }
 
             @Step {
-                `makeUIView`는 AR 화면이 처음 생성될 때 호출되고, `updateUIView`는 SwiftUI 상태가 변경될 때 호출됩니다.
+                `makeUIView`는 AR 화면이 처음 생성될 때 한 번 호출됩니다. 카메라를 준비하거나 ARSession을 시작하는 작업은 보통 이 시점에 진행합니다.
+
+                `updateUIView`는 SwiftUI의 상태가 바뀔 때 호출됩니다. 이번 예제에서는 별도의 SwiftUI 상태로 AR 화면을 갱신하지 않으므로 빈 함수로 둡니다.
+
+                @Image(source: "01-contentview.svg", alt: "ARView가 화면에 표시되는 모습")
+                @Code(name: "ARViewContainer.swift", file: "ARViewContainer.swift")
+            }
+
+            @Step {
+                이제 `ContentView`의 `body`에서 `ARViewContainer()`를 화면에 배치합니다. `.ignoresSafeArea()`를 붙이면 카메라 화면이 iPhone의 위·아래 안전 영역까지 꽉 차게 됩니다.
+
+                처음 실행했을 때 검은 화면이나 카메라 화면이 보이면 정상입니다. 아직 포스터를 추적하도록 설정하지 않았기 때문에 이 단계에서는 3D 포털이 나타나지 않습니다.
+
+                @Image(source: "01-contentview.svg", alt: "ContentView에 ARViewContainer를 배치하는 단계")
+                @Code(name: "ContentView.swift", file: "ContentView.swift")
             }
         }
     }
 
     @Section(title: "2. 참조 이미지 등록하기") {
+        @ContentAndMedia {
+            AR Resources에 등록한 영화 포스터를 ARKit이 인식할 수 있도록 Image Tracking 설정에 연결합니다.
+
+            @Image(source: "02-reference-image.svg", alt: "AR Resources와 영화 포스터 참조 이미지")
+        }
+
         @Steps {
             @Step {
-                `Assets.xcassets` 안의 `AR Resources` 그룹에 인식할 영화 포스터를 추가합니다. 참조 이미지의 실제 가로 크기도 설정합니다.
+                `Assets.xcassets` 안의 `AR Resources` 그룹에 인식할 영화 포스터를 추가합니다. 이 이미지는 단순히 화면에 보여주는 이미지가 아니라, ARKit이 카메라 영상과 비교할 “참조 이미지”입니다.
+
+                포스터를 추가한 뒤 실제 포스터의 가로 길이를 입력해야 합니다. 실제 크기를 알아야 ARKit이 포스터와 포털의 크기를 현실 공간에서 올바르게 계산할 수 있습니다.
+
+                @Image(source: "02-reference-image.svg", alt: "AR Resources에 등록할 포스터 이미지")
+                @Code(name: "ReferenceImageGroup.swift", file: "ReferenceImageGroup.swift")
             }
 
             @Step {
-                참조 이미지 그룹을 읽고 Image Tracking 설정에 전달합니다.
+                포스터 리소스를 선택하고 Inspector에서 실제 포스터의 가로 길이를 입력합니다. 예를 들어 실제 포스터 너비가 0.30m라면 Width에 0.30을 입력합니다.
 
-                ```swift
-                guard let referenceImages = ARReferenceImage.referenceImages(
-                    inGroupNamed: "AR Resources",
-                    bundle: nil
-                ) else {
-                    print("AR Resources 그룹을 찾을 수 없습니다.")
-                    return arView
-                }
+                이 값은 사진 파일의 픽셀 크기가 아닙니다. 실제 종이 포스터를 자로 측정한 물리적 크기입니다. 잘못 입력하면 포털의 크기와 영상 위치가 실제 포스터와 어긋날 수 있습니다.
 
-                let configuration = ARImageTrackingConfiguration()
-                configuration.trackingImages = referenceImages
-                configuration.maximumNumberOfTrackedImages = 1
-                ```
+                @Image(source: "02-reference-image.svg", alt: "참조 이미지의 실제 크기를 입력하는 단계")
+                @Code(name: "PortalSize.swift", file: "PortalSize.swift")
+            }
+
+            @Step {
+                참조 이미지 그룹을 읽고 Image Tracking 설정에 전달합니다. 그룹 이름은 Assets.xcassets에 보이는 이름과 정확히 같아야 하며, 철자나 띄어쓰기가 다르면 이미지를 찾지 못합니다.
+
+                @Image(source: "02-physical-size.svg", alt: "Image Tracking 설정을 사용하는 AR 장면")
+                @Code(name: "ImageTrackingConfiguration.swift", file: "ImageTrackingConfiguration.swift")
+            }
+
+            @Step {
+                `maximumNumberOfTrackedImages = 1`은 한 번에 포스터 하나만 추적하겠다는 뜻입니다. 처음 배우는 단계에서는 추적 대상을 하나로 제한하면 어떤 이미지 때문에 콘텐츠가 생겼는지 확인하기 쉽습니다.
+
+                @Image(source: "02-single-image.svg", alt: "하나의 포스터만 추적하도록 제한하는 단계")
+                @Code(name: "TrackingLimit.swift", file: "TrackingLimit.swift")
             }
         }
     }
 
     @Section(title: "3. ARSession 시작하기") {
+        @ContentAndMedia {
+            ARSession을 실행하면 카메라 영상에서 포스터를 찾고 추적할 수 있습니다.
+
+            @Image(source: "03-ar-session.svg", alt: "카메라 프레임을 분석하는 ARSession 흐름")
+        }
+
         @Steps {
             @Step {
-                `ARSession`은 카메라 프레임을 분석하고 추적 결과를 전달합니다. 먼저 delegate를 연결합니다.
+                `ARSession`은 카메라 프레임을 계속 분석하고 추적 결과를 전달하는 객체입니다. 포스터를 찾았다는 소식을 받으려면 ARSession에 Coordinator를 delegate로 연결해야 합니다.
+
+                @Image(source: "03-ar-session.svg", alt: "카메라 프레임을 분석하는 ARSession")
+                @Code(name: "SessionDelegate.swift", file: "SessionDelegate.swift")
             }
 
             @Step {
-                설정을 사용해 ARSession을 실행합니다.
+                설정을 사용해 ARSession을 실행합니다. `resetTracking`은 이전 추적 결과를 지우고 새로 시작하는 옵션이고, `removeExistingAnchors`는 이전에 만들어진 3D 앵커를 제거하는 옵션입니다.
 
-                ```swift
-                arView.session.delegate = context.coordinator
-                arView.session.run(
-                    configuration,
-                    options: [.resetTracking, .removeExistingAnchors]
-                )
-                ```
+                @Image(source: "03-ar-session.svg", alt: "실행 중인 ARSession")
+                @Code(name: "ARSessionSetup.swift", file: "ARSessionSetup.swift")
+            }
+
+            @Step {
+                이 코드는 `makeUIView(context:)` 안에서 ARView를 만든 직후 실행해야 합니다. ARView가 만들어지기 전에 `session`을 사용하면 연결할 대상이 없기 때문입니다.
+
+                실행 후 카메라 권한을 묻는 창이 나오면 `허용`을 누릅니다. 권한 창이 나오지 않는다면 앱의 Camera Usage Description 설정을 먼저 확인합니다.
+
+                @Image(source: "03-session-order.svg", alt: "ARView 생성 후 ARSession을 시작하는 순서")
+                @Code(name: "ARSessionSetup.swift", file: "ARSessionSetup.swift")
             }
         }
     }
 
     @Section(title: "4. 포스터 인식 감지하기") {
+        @ContentAndMedia {
+            포스터가 인식되면 ARKit은 포스터의 위치와 방향을 담은 ARImageAnchor를 전달합니다.
+
+            @Image(source: "04-image-anchor.svg", alt: "포스터 인식과 ARImageAnchor 생성")
+        }
+
         @Steps {
             @Step {
-                ARKit이 참조 이미지를 찾으면 `ARImageAnchor`를 추가합니다. `session(_:didAdd:)`에서 새 앵커를 받습니다.
+                ARKit이 카메라 영상에서 참조 이미지를 찾으면 `ARImageAnchor`를 추가합니다. 이 앵커에는 포스터의 위치, 방향, 실제 크기 정보가 들어 있습니다.
+
+                `session(_:didAdd:)`는 “새로운 ARAnchor가 추가되었다”는 알림을 받는 함수입니다. 여기서 이미지 앵커만 골라내면 포스터를 인식한 순간을 잡을 수 있습니다.
+
+                @Image(source: "04-image-anchor.svg", alt: "포스터를 인식한 ARImageAnchor")
+                @Code(name: "ImageAnchorCheck.swift", file: "ImageAnchorCheck.swift")
             }
 
             @Step {
-                이미지 앵커를 찾아 포털 생성 함수에 전달합니다.
+                여러 종류의 앵커가 들어올 수 있으므로 `as? ARImageAnchor`로 이미지 앵커인지 확인합니다. 이미지 앵커가 맞을 때만 `createPortal(on:)`을 호출해 포스터 앞에 콘텐츠를 만듭니다.
 
-                ```swift
-                func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
-                    for anchor in anchors {
-                        guard let imageAnchor = anchor as? ARImageAnchor else {
-                            continue
-                        }
+                @Image(source: "04-image-anchor.svg", alt: "이미지 앵커에 연결된 포털")
+                @Code(name: "ImageAnchorDelegate.swift", file: "ImageAnchorDelegate.swift")
+            }
 
-                        createPortal(on: imageAnchor)
-                    }
-                }
-                ```
+            @Step {
+                `didAdd`는 포스터를 처음 발견했을 때 호출됩니다. 포스터를 계속 바라본다고 매번 새 포털을 만들면 같은 영상이 여러 개 생길 수 있으므로, 실제 앱에서는 이미 만든 앵커인지 확인하는 처리를 추가할 수 있습니다.
+
+                @Image(source: "04-create-once.svg", alt: "포스터 인식 시 한 번 포털을 생성하는 단계")
+                @Code(name: "PortalAnchor.swift", file: "PortalAnchor.swift")
             }
         }
     }
 
     @Section(title: "5. 앵커에 포털 붙이기") {
+        @ContentAndMedia {
+            이미지 앵커에 검은 포털 벽과 영상 화면을 자식 Entity로 추가합니다.
+
+            @Image(source: "05-portal-anchor.svg", alt: "AnchorEntity에 영화관 포털을 붙이는 구조")
+        }
+
         @Steps {
             @Step {
-                `AnchorEntity(anchor:)`는 포스터의 위치와 회전을 따라갑니다. 여기에 포털 벽과 영상을 자식으로 추가합니다.
+                `AnchorEntity(anchor:)`는 ARImageAnchor의 위치와 회전을 RealityKit Entity에 연결합니다. 따라서 사용자가 포스터를 움직이거나 휴대폰을 움직여도 포털이 포스터를 따라갑니다.
+
+                포털 벽과 영상 화면은 이 AnchorEntity의 자식으로 추가합니다. 부모 앵커가 이동하면 자식 Entity도 함께 이동하는 구조입니다.
+
+                @Image(source: "05-portal-anchor.svg", alt: "포스터를 따라가는 AnchorEntity")
+                @Code(name: "PortalAnchor.swift", file: "PortalAnchor.swift")
             }
 
             @Step {
-                참조 이미지의 실제 크기로 포털 크기를 계산합니다.
+                참조 이미지의 실제 크기로 포털 크기를 계산합니다. `physicalSize.width`와 `physicalSize.height`는 미터 단위이므로, 이 값을 사용하면 포털이 포스터보다 너무 크거나 작아지는 문제를 줄일 수 있습니다.
 
-                ```swift
-                let size = imageAnchor.referenceImage.physicalSize
-                let width = Float(size.width)
-                let height = Float(size.height)
-                let anchorEntity = AnchorEntity(anchor: imageAnchor)
-                ```
+                @Image(source: "05-portal-anchor.svg", alt: "포스터 크기로 계산한 포털 영역")
+                @Code(name: "PortalSize.swift", file: "PortalSize.swift")
             }
 
             @Step {
-                현재 앱은 앞쪽으로 퍼지는 영화관 벽, 검은 배경, 영상 화면을 하나의 앵커에 연결합니다.
+                현재 앱은 앞쪽으로 퍼지는 영화관 벽, 검은 배경, 영상 화면을 하나의 앵커에 연결합니다. 검은 배경은 영상 비율 때문에 생기는 빈 공간을 가리고, 양옆 벽은 화면이 포스터 안쪽으로 열리는 깊이감을 만듭니다.
+
+                @Image(source: "05-portal-anchor.svg", alt: "영화관처럼 펼쳐진 포털 벽과 화면")
+                @Code(name: "PortalWall.swift", file: "PortalWall.swift")
+            }
+
+            @Step {
+                Entity의 위치는 포스터 앵커를 기준으로 한 상대 좌표입니다. 영상 화면을 포스터에 너무 가깝게 두면 벽과 겹칠 수 있고, 너무 멀리 두면 포스터와 떨어져 보입니다.
+
+                이번 예제에서는 화면을 포스터 안쪽으로 조금 이동시키고, 벽의 앞쪽 끝이 영상 화면과 이어지도록 배치합니다.
+
+                @Image(source: "05-depth.svg", alt: "포스터와 영상 화면 사이의 깊이를 조절하는 단계")
+                @Code(name: "BackgroundPlane.swift", file: "BackgroundPlane.swift")
             }
         }
     }
 
     @Section(title: "6. 일반 Video 연결하기") {
+        @ContentAndMedia {
+            AVPlayer로 Trailer.mov를 재생하고 VideoMaterial을 통해 RealityKit 화면에 표시합니다.
+
+            @Image(source: "06-video-material.svg", alt: "AVPlayer와 VideoMaterial 연결")
+        }
+
         @Steps {
             @Step {
-                앱 번들에서 `Trailer.mov`를 찾습니다. 파일은 앱 Target Membership에 포함되어 있어야 합니다.
+                앱 번들에서 `Trailer.mov`를 찾습니다. 앱 번들은 앱이 실행될 때 함께 들어가는 리소스 묶음입니다. 파일이 프로젝트에만 있고 Target Membership에 포함되지 않으면 `Bundle.main.url`이 nil을 반환합니다.
 
-                ```swift
-                guard let videoURL = Bundle.main.url(
-                    forResource: "Trailer",
-                    withExtension: "mov"
-                ) else {
-                    print("Trailer.mov를 앱 번들에서 찾을 수 없습니다.")
-                    return false
-                }
-                ```
+                @Image(source: "06-video-material.svg", alt: "앱 번들에서 찾은 Trailer.mov")
+                @Code(name: "VideoURL.swift", file: "VideoURL.swift")
             }
 
             @Step {
-                `AVPlayer`의 영상을 `VideoMaterial`에 연결하고 재생합니다.
+                `AVPlayer`는 영상 파일을 재생하는 객체이고, `VideoMaterial`은 그 재생 결과를 RealityKit 표면에 보여주는 재질입니다. 둘을 연결해야 소리는 나지만 화면은 안 나오는 문제를 피할 수 있습니다.
 
-                ```swift
-                let player = AVPlayer(url: videoURL)
-                let videoMaterial = VideoMaterial(avPlayer: player)
-                player.play()
-                ```
+                @Image(source: "06-video-material.svg", alt: "VideoMaterial로 재생되는 예고편 화면")
+                @Code(name: "VideoMaterialSetup.swift", file: "VideoMaterialSetup.swift")
+            }
+
+            @Step {
+                `player.play()`는 영상 재생을 시작하는 명령입니다. 소리는 나는데 화면이 보이지 않는다면 먼저 VideoMaterial이 실제 영상 Mesh에 적용되었는지, 영상 파일이 앱 번들에 포함되었는지 확인합니다.
+
+                @Image(source: "06-play.svg", alt: "AVPlayer 재생 결과가 VideoMaterial로 화면에 나타나는 단계")
+                @Code(name: "VideoPlane.swift", file: "VideoPlane.swift")
             }
         }
     }
 
     @Section(title: "7. 영상 비율과 레터박스 맞추기") {
+        @ContentAndMedia {
+            원본 영상 비율은 유지하면서 포스터 안쪽을 검은 레터박스로 채웁니다.
+
+            @Image(source: "07-aspect-fit.svg", alt: "영상 원본 비율과 검은 레터박스")
+        }
+
         @Steps {
             @Step {
-                포스터와 영상의 비율이 다르면 영상을 늘리지 않고 `AVAsset`에서 원본 비율을 계산합니다.
+                포스터와 영상의 비율이 다르면 영상을 억지로 늘리지 않고 `AVAsset`에서 원본 비율을 계산합니다. 영상이 찌그러지지 않도록 가로세로 비율을 먼저 확인하는 단계입니다.
+
+                @Image(source: "07-aspect-fit.svg", alt: "원본 비율을 유지하는 영상 화면")
+                @Code(name: "VideoAspectFit.swift", file: "VideoAspectFit.swift")
             }
 
             @Step {
-                영상이 포스터 안에 들어오도록 aspect fit 크기를 계산합니다.
+                영상이 포스터 안에 들어오도록 aspect fit 크기를 계산합니다. 가로가 더 긴 영상이면 포스터의 가로 길이에 맞추고, 세로가 더 긴 영상이면 포스터의 세로 길이에 맞춥니다.
 
-                ```swift
-                let videoAspectRatio = videoAspectRatio(for: videoURL)
-                let posterAspectRatio = width / height
-
-                if videoAspectRatio > posterAspectRatio {
-                    screenWidth = width
-                    screenHeight = width / videoAspectRatio
-                } else {
-                    screenHeight = height
-                    screenWidth = height * videoAspectRatio
-                }
-                ```
+                @Image(source: "07-aspect-fit.svg", alt: "포스터 안에 맞춰진 영상 화면")
+                @Code(name: "VideoAspectFit.swift", file: "VideoAspectFit.swift")
             }
 
             @Step {
-                포스터 크기의 검은 배경을 영상 뒤에 배치해 남는 위·아래 영역을 레터박스로 채웁니다.
+                포스터 크기의 검은 배경을 영상 뒤에 배치해 남는 위·아래 영역을 레터박스로 채웁니다. 이렇게 하면 뒤쪽의 실제 포스터가 비치지 않고, 영상은 원본 비율 그대로 유지됩니다.
+
+                @Image(source: "07-aspect-fit.svg", alt: "검은 레터박스가 추가된 영화 화면")
+                @Code(name: "BackgroundPlane.swift", file: "BackgroundPlane.swift")
+            }
+
+            @Step {
+                영상 화면은 검은 배경보다 앞에 있어야 합니다. 두 Entity의 깊이 순서가 반대이면 검은 배경이 영상을 가려서 “영상이 재생되지만 화면은 검은색”처럼 보일 수 있습니다.
+
+                @Image(source: "07-layer-order.svg", alt: "검은 배경 뒤에 영상 화면을 배치하는 순서")
+                @Code(name: "VideoPlane.swift", file: "VideoPlane.swift")
             }
         }
     }
 
     @Section(title: "8. 실제 기기에서 확인하기") {
+        @ContentAndMedia {
+            실제 iPhone 또는 iPad에서 포스터를 비추고 완성된 AR 영화 포털을 확인합니다.
+
+            @Image(source: "08-device-test.svg", alt: "실제 기기에서 포스터를 인식하는 모습")
+        }
+
         @Steps {
             @Step {
-                실제 iPhone 또는 iPad를 실행 대상으로 선택합니다. Simulator에서는 카메라 기반 Image Tracking을 확인할 수 없습니다.
+                실제 iPhone 또는 iPad를 실행 대상으로 선택합니다. Simulator에서는 실제 카메라 영상과 ARImageTracking을 확인할 수 없으므로 반드시 ARKit을 지원하는 기기가 필요합니다.
+
+                @Image(source: "08-device-test.svg", alt: "실제 iPhone에서 실행하는 AR 앱")
+                @Code(name: "DeviceCheck.swift", file: "DeviceCheck.swift")
             }
 
             @Step {
-                카메라 권한을 허용하고 `AR Resources`에 등록한 토이스토리 포스터를 준비합니다.
+                카메라 권한을 허용하고 `AR Resources`에 등록한 토이스토리 포스터를 준비합니다. 화면에 포스터 전체가 보이도록 하고, 너무 어둡거나 반사되는 곳은 피하면 인식이 더 잘 됩니다.
+
+                @Image(source: "08-poster-framing.svg", alt: "카메라 앞에 준비한 영화 포스터")
+                @Code(name: "CameraPermission.swift", file: "CameraPermission.swift")
             }
 
             @Step {
-                포스터 전체가 카메라에 보이도록 비추면 영상과 검은색 포털 벽이 나타납니다.
+                포스터를 화면에 너무 작게 보이게 하지 말고, 포스터의 모서리와 특징적인 그림이 모두 카메라에 들어오게 합니다. 인식이 되면 콘솔에 `포스터 인식 완료`가 출력되고 포털이 생성됩니다.
 
-                ```text
-                포스터 인식 완료
-                영상 파일 발견: Trailer.mov
-                영상 재생 시작
-                ```
+                @Image(source: "08-recognition.svg", alt: "포스터 전체를 iPhone 카메라에 담는 단계")
+                @Code(name: "DebugLog.swift", file: "DebugLog.swift")
+            }
+
+            @Step {
+                포스터 전체가 카메라에 보이도록 비추면 영상과 검은색 포털 벽이 나타납니다. 먼저 포스터를 화면 중앙에 안정적으로 비춘 뒤, 인식이 끝나면 휴대폰을 천천히 움직여 포털이 포스터를 따라오는지 확인합니다.
+
+                @Image(source: "06-video-material.svg", alt: "포스터 안에서 재생되는 영화 예고편")
             }
         }
     }

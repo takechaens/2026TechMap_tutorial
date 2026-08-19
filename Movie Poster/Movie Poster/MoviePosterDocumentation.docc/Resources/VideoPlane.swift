@@ -1,0 +1,6 @@
+let player = AVPlayer(url: videoURL)
+let material = VideoMaterial(avPlayer: player)
+let mesh = MeshResource.generatePlane(width: screenWidth, depth: screenHeight)
+let screen = ModelEntity(mesh: mesh, materials: [material])
+anchorEntity.addChild(screen)
+player.play()
