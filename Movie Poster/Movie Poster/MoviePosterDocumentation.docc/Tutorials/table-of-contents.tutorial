@@ -1,0 +1,10 @@
+@Tutorials(name: "Movie Poster") {
+    @Intro(title: "ARKit Image Tracking Tutorial") {
+        영화 포스터를 인식하면 포스터 안쪽에 영화관처럼 깊이감 있는 포털과 영화 예고편이 열리는 과정을 단계별로 배웁니다.
+    }
+
+    @Chapter(name: "포스터 안에 영화 예고편 열기") {
+        @Image(source: "portal.svg", alt: "어두운 영화관 벽 안쪽에 파란색과 보라색 영상 화면이 있는 AR 포털")
+        @TutorialReference(tutorial: "doc:MoviePosterTutorial")
+    }
+}

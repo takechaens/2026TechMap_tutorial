@@ -1,0 +1,201 @@
+@Tutorial(time: 30) {
+    @Intro(title: "포스터 안에 영화 예고편 열기") {
+        카메라로 영화 포스터를 인식하고, 포스터 위치에 깊이감 있는 3D 영화관 포털과 일반 Video 예고편을 배치합니다.
+
+        이 튜토리얼은 Spatial Video가 아니라 일반 2D Video를 사용합니다.
+    }
+
+    @Section(title: "1. AR 화면 준비하기") {
+        @Steps {
+            @Step {
+                SwiftUI에서 RealityKit의 `ARView`를 사용하려면 `UIViewRepresentable`로 감쌉니다.
+
+                ```swift
+                struct ARViewContainer: UIViewRepresentable {
+                    func makeUIView(context: Context) -> ARView {
+                        ARView(frame: .zero)
+                    }
+
+                    func updateUIView(_ uiView: ARView, context: Context) {}
+                }
+                ```
+            }
+
+            @Step {
+                `makeUIView`는 AR 화면이 처음 생성될 때 호출되고, `updateUIView`는 SwiftUI 상태가 변경될 때 호출됩니다.
+            }
+        }
+    }
+
+    @Section(title: "2. 참조 이미지 등록하기") {
+        @Steps {
+            @Step {
+                `Assets.xcassets` 안의 `AR Resources` 그룹에 인식할 영화 포스터를 추가합니다. 참조 이미지의 실제 가로 크기도 설정합니다.
+            }
+
+            @Step {
+                참조 이미지 그룹을 읽고 Image Tracking 설정에 전달합니다.
+
+                ```swift
+                guard let referenceImages = ARReferenceImage.referenceImages(
+                    inGroupNamed: "AR Resources",
+                    bundle: nil
+                ) else {
+                    print("AR Resources 그룹을 찾을 수 없습니다.")
+                    return arView
+                }
+
+                let configuration = ARImageTrackingConfiguration()
+                configuration.trackingImages = referenceImages
+                configuration.maximumNumberOfTrackedImages = 1
+                ```
+            }
+        }
+    }
+
+    @Section(title: "3. ARSession 시작하기") {
+        @Steps {
+            @Step {
+                `ARSession`은 카메라 프레임을 분석하고 추적 결과를 전달합니다. 먼저 delegate를 연결합니다.
+            }
+
+            @Step {
+                설정을 사용해 ARSession을 실행합니다.
+
+                ```swift
+                arView.session.delegate = context.coordinator
+                arView.session.run(
+                    configuration,
+                    options: [.resetTracking, .removeExistingAnchors]
+                )
+                ```
+            }
+        }
+    }
+
+    @Section(title: "4. 포스터 인식 감지하기") {
+        @Steps {
+            @Step {
+                ARKit이 참조 이미지를 찾으면 `ARImageAnchor`를 추가합니다. `session(_:didAdd:)`에서 새 앵커를 받습니다.
+            }
+
+            @Step {
+                이미지 앵커를 찾아 포털 생성 함수에 전달합니다.
+
+                ```swift
+                func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
+                    for anchor in anchors {
+                        guard let imageAnchor = anchor as? ARImageAnchor else {
+                            continue
+                        }
+
+                        createPortal(on: imageAnchor)
+                    }
+                }
+                ```
+            }
+        }
+    }
+
+    @Section(title: "5. 앵커에 포털 붙이기") {
+        @Steps {
+            @Step {
+                `AnchorEntity(anchor:)`는 포스터의 위치와 회전을 따라갑니다. 여기에 포털 벽과 영상을 자식으로 추가합니다.
+            }
+
+            @Step {
+                참조 이미지의 실제 크기로 포털 크기를 계산합니다.
+
+                ```swift
+                let size = imageAnchor.referenceImage.physicalSize
+                let width = Float(size.width)
+                let height = Float(size.height)
+                let anchorEntity = AnchorEntity(anchor: imageAnchor)
+                ```
+            }
+
+            @Step {
+                현재 앱은 앞쪽으로 퍼지는 영화관 벽, 검은 배경, 영상 화면을 하나의 앵커에 연결합니다.
+            }
+        }
+    }
+
+    @Section(title: "6. 일반 Video 연결하기") {
+        @Steps {
+            @Step {
+                앱 번들에서 `Trailer.mov`를 찾습니다. 파일은 앱 Target Membership에 포함되어 있어야 합니다.
+
+                ```swift
+                guard let videoURL = Bundle.main.url(
+                    forResource: "Trailer",
+                    withExtension: "mov"
+                ) else {
+                    print("Trailer.mov를 앱 번들에서 찾을 수 없습니다.")
+                    return false
+                }
+                ```
+            }
+
+            @Step {
+                `AVPlayer`의 영상을 `VideoMaterial`에 연결하고 재생합니다.
+
+                ```swift
+                let player = AVPlayer(url: videoURL)
+                let videoMaterial = VideoMaterial(avPlayer: player)
+                player.play()
+                ```
+            }
+        }
+    }
+
+    @Section(title: "7. 영상 비율과 레터박스 맞추기") {
+        @Steps {
+            @Step {
+                포스터와 영상의 비율이 다르면 영상을 늘리지 않고 `AVAsset`에서 원본 비율을 계산합니다.
+            }
+
+            @Step {
+                영상이 포스터 안에 들어오도록 aspect fit 크기를 계산합니다.
+
+                ```swift
+                let videoAspectRatio = videoAspectRatio(for: videoURL)
+                let posterAspectRatio = width / height
+
+                if videoAspectRatio > posterAspectRatio {
+                    screenWidth = width
+                    screenHeight = width / videoAspectRatio
+                } else {
+                    screenHeight = height
+                    screenWidth = height * videoAspectRatio
+                }
+                ```
+            }
+
+            @Step {
+                포스터 크기의 검은 배경을 영상 뒤에 배치해 남는 위·아래 영역을 레터박스로 채웁니다.
+            }
+        }
+    }
+
+    @Section(title: "8. 실제 기기에서 확인하기") {
+        @Steps {
+            @Step {
+                실제 iPhone 또는 iPad를 실행 대상으로 선택합니다. Simulator에서는 카메라 기반 Image Tracking을 확인할 수 없습니다.
+            }
+
+            @Step {
+                카메라 권한을 허용하고 `AR Resources`에 등록한 토이스토리 포스터를 준비합니다.
+            }
+
+            @Step {
+                포스터 전체가 카메라에 보이도록 비추면 영상과 검은색 포털 벽이 나타납니다.
+
+                ```text
+                포스터 인식 완료
+                영상 파일 발견: Trailer.mov
+                영상 재생 시작
+                ```
+            }
+        }
+    }
+}

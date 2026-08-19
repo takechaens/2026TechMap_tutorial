@@ -6,7 +6,7 @@
 
 Xcode에서 프로젝트를 연 뒤 **Product > Build Documentation**을 실행합니다. DocC 카탈로그는 다음 경로에 있습니다.
 
-`Movie Poster/Movie Poster.docc`
+`Movie Poster/MoviePosterDocumentation.docc`
 
 ## GitHub Pages 배포
 
