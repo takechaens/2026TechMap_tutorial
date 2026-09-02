@@ -10,7 +10,7 @@
 
         **시작하기 전에 준비하세요.** 본인이 원하는 영화 포스터 사진 1장과, 그 포스터를 인식했을 때 재생할 일반 2D 영상 1개를 미리 준비합니다. 포스터 사진은 실제로 카메라에 비출 이미지여야 하고, 영상은 앱 번들에 포함할 `.mov` 파일이어야 합니다. 이 예제는 제공된 `토이스토리 포스터.jpeg`와 `토이스토리.mov`를 사용합니다. 두 파일을 준비하지 않으면 뒤의 AR 인식 또는 영상 프리뷰를 확인할 수 없습니다.
 
-        @Image(source: "토이스토리 포스터.jpeg", alt: "ARKit이 인식할 토이스토리 영화 포스터")
+        @Image(source: "toy-story-poster.jpeg", alt: "ARKit이 인식할 토이스토리 영화 포스터")
     }
 
     @Section(title: "1. AR 화면 준비하기") {
@@ -526,7 +526,7 @@
                 @Code(name: "VideoCheck.swift", file: "VideoCheck.swift", previousFile: "DebugLog.swift") {
                 }
 
-                @Video(source: "토이스토리.mov", poster: "토이스토리 포스터.jpeg", alt: "토이스토리 포스터를 인식한 뒤 재생되는 영화 예고편")
+                @Video(source: "toy-story.mov", poster: "toy-story-poster.jpeg", alt: "토이스토리 포스터를 인식한 뒤 재생되는 영화 예고편")
             }
         }
     }
