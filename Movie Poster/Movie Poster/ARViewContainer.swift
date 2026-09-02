@@ -97,10 +97,10 @@ struct ARViewContainer: UIViewRepresentable {
             // 일반 2D 영상만 사용합니다.
             // Spatial Video는 좌우 시점 정보가 포함될 수 있으므로
             // 현재 학습 단계에서는 단일 화면 Video를 사용합니다.
-            let videoURL = Bundle.main.url(forResource: "Trailer", withExtension: "mov")
+            let videoURL = Bundle.main.url(forResource: "토이스토리", withExtension: "mov")
 
             guard let videoURL else {
-                print("Trailer.mov를 앱 번들에서 찾을 수 없습니다. Target Membership를 확인하세요.")
+                print("토이스토리.mov를 앱 번들에서 찾을 수 없습니다. Target Membership를 확인하세요.")
                 return false
             }
             print("영상 파일 발견: \(videoURL.lastPathComponent)")

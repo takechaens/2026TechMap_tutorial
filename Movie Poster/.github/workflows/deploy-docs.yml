@@ -29,10 +29,13 @@ jobs:
       - name: Build DocC archive
         run: |
           xcodebuild docbuild \
-            -project "Movie Poster.xcodeproj" \
+            -project "Movie Poster/Movie Poster.xcodeproj" \
             -scheme "Movie Poster" \
             -destination 'generic/platform=iOS' \
-            -derivedDataPath "$RUNNER_TEMP/DerivedData"
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            IPHONEOS_DEPLOYMENT_TARGET=26.2
 
       - name: Convert DocC archive for static hosting
         run: |

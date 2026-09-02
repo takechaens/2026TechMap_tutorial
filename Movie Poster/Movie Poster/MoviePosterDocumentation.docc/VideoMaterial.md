@@ -3,7 +3,7 @@
 ## 영상 재생 구조
 
 ```text
-Trailer.mov
+토이스토리.mov
     ↓
 AVPlayer
     ↓

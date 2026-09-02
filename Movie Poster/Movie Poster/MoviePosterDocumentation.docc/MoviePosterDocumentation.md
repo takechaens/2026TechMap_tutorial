@@ -30,4 +30,4 @@
 | `ContentView.swift` | AR 화면을 전체 화면으로 표시 |
 | `ARViewContainer.swift` | SwiftUI와 RealityKit/ARKit 연결 |
 | `Assets.xcassets/AR Resources` | 인식할 포스터 이미지 저장 |
-| `Trailer.mov` | `AVPlayer`로 재생할 일반 Video |
+| `토이스토리.mov` | `AVPlayer`로 재생할 일반 Video |

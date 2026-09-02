@@ -1,7 +1,7 @@
 guard let videoURL = Bundle.main.url(
-    forResource: "Trailer",
+    forResource: "토이스토리",
     withExtension: "mov"
 ) else {
-    print("Trailer.mov를 찾지 못했습니다.")
+    print("토이스토리.mov를 찾지 못했습니다.")
     return
 }
