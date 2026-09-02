@@ -1,4 +1,8 @@
 @Tutorial(time: 60) {
+    @Metadata {
+        @PageImage(purpose: icon, source: "toy-story-poster.jpeg", alt: "어두운 영화관 분위기 위에 토이스토리 영화 포스터가 보이는 안내 이미지")
+    }
+
     @Intro(title: "포스터 안에 영화 예고편 열기") {
         카메라로 영화 포스터를 인식하면 포스터 안쪽에 영화관처럼 깊이감 있는 포털이 열리고, 그 안에서 영화 예고편이 재생되는 AR 앱을 만듭니다.
 
