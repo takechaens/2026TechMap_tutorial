@@ -39,13 +39,35 @@ jobs:
             IPHONEOS_DEPLOYMENT_TARGET=26.2
 
       - name: Convert DocC archive for static hosting
+        env:
+          # GitHub Pages serves a project site at https://<owner>.github.io/<repo>/,
+          # so the hosting base path must be exactly the repository name.
+          BASE_PATH: ${{ github.event.repository.name }}
         run: |
+          echo "hosting base path: $BASE_PATH"
+
           ARCHIVE=$(find "$RUNNER_TEMP/DerivedData/Build/Products" -name '*.doccarchive' -print -quit)
           test -n "$ARCHIVE"
 
           xcrun docc process-archive transform-for-static-hosting "$ARCHIVE" \
-            --hosting-base-path "${GITHUB_REPOSITORY#*/}" \
+            --hosting-base-path "$BASE_PATH" \
             --output-path "$RUNNER_TEMP/docs"
+
+          # Work around swiftlang/swift-docc#170: `transform-for-static-hosting`
+          # rewrites every nested index.html to use --hosting-base-path but leaves
+          # the ROOT index.html pointing at "/" (var baseUrl = "/", /js, /css),
+          # which 404s on a project Pages site and shows a blank page.
+          # Patch the root index.html to match the nested ones.
+          ROOT_INDEX="$RUNNER_TEMP/docs/index.html"
+          sed -i '' \
+            -e 's|var baseUrl = "/"|var baseUrl = "/'"$BASE_PATH"'/"|g' \
+            -e 's|href="/favicon|href="/'"$BASE_PATH"'/favicon|g' \
+            -e 's|src="/js/|src="/'"$BASE_PATH"'/js/|g' \
+            -e 's|href="/css/|href="/'"$BASE_PATH"'/css/|g' \
+            "$ROOT_INDEX"
+
+          echo "patched root index.html:"
+          grep -oE 'baseUrl = "[^"]*"|(src|href)="/[^"]+"' "$ROOT_INDEX"
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
