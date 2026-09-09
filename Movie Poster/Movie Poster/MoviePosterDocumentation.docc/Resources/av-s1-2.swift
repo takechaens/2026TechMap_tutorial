@@ -1,0 +1,15 @@
+import SwiftUI
+import RealityKit
+
+/// SwiftUI 화면 안에 UIKit 기반의 ARView를 넣기 위한 연결 코드입니다.
+///
+/// SwiftUI는 선언형 UI 프레임워크이고, ARView는 UIKit/RealityKit 객체입니다.
+/// UIViewRepresentable을 사용하면 SwiftUI 안에서 ARView를 사용할 수 있습니다.
+struct ARViewContainer: UIViewRepresentable {
+    // ARView가 화면에 처음 만들어질 때 한 번 호출됩니다.
+    func makeUIView(context: Context) -> ARView {
+        // 카메라 화면과 RealityKit 콘텐츠를 표시할 ARView를 만듭니다.
+        let arView = ARView(frame: .zero)
+        return arView
+    }
+}
