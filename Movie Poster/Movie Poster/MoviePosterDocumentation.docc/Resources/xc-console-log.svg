@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750">
+<rect width="1200" height="750" fill="#eceef1"/>
+<rect x="64" y="68" width="1080" height="560" rx="12" fill="#000000" opacity="0.1"/>
+<rect x="60" y="60" width="1080" height="560" rx="12" fill="#fcfcfd" stroke="#d3d3d8" stroke-width="1"/>
+<clipPath id="clip-60-60"><rect x="60" y="60" width="1080" height="560" rx="12"/></clipPath>
+<g clip-path="url(#clip-60-60)">
+<rect x="60" y="60" width="1080" height="34" rx="0" fill="#e7e7ea"/>
+<circle cx="82" cy="77.0" r="6" fill="#ff5f57"/>
+<circle cx="102" cy="77.0" r="6" fill="#febc2e"/>
+<circle cx="122" cy="77.0" r="6" fill="#28c840"/>
+<text x="600.0" y="82.0" font-family="'Helvetica Neue', Arial, sans-serif" font-size="13" font-weight="600" fill="#6e6e73" text-anchor="middle">Movie Poster — 실행 중 (채은&#x27;s iPhone)</text>
+<rect x="60" y="94" width="1080" height="38" rx="0" fill="#f0f0f3"/>
+<line x1="60" y1="132" x2="1140" y2="132" stroke="#e2e2e6" stroke-width="1"/>
+<circle cx="86" cy="113.0" r="11" fill="#c9c9cd"/>
+<path d="M82 107.0 L82 119.0 L91 113.0 Z" fill="#5a5a5e"/>
+<circle cx="114" cy="113.0" r="11" fill="#dadade"/>
+<rect x="109" y="108.0" width="10" height="10" rx="2" fill="#8e8e93"/>
+<rect x="144" y="102.0" width="210" height="22" rx="5" fill="#e5e5e9"/>
+<text x="154" y="117.0" font-family="'Helvetica Neue', Arial, sans-serif" font-size="11" font-weight="600" fill="#1d1d1f" text-anchor="start">Movie Poster &gt; 채은&#x27;s iPhone</text>
+</g>
+<rect x="60" y="132" width="1080" height="488" rx="0" fill="#ffffff"/>
+<rect x="60" y="132" width="1080" height="190" rx="0" fill="#fbfbfc"/>
+<line x1="90" y1="156" x2="610" y2="156" stroke="#e2e2e6" stroke-width="8"/>
+<line x1="90" y1="180" x2="580" y2="180" stroke="#e2e2e6" stroke-width="8"/>
+<line x1="90" y1="204" x2="550" y2="204" stroke="#e2e2e6" stroke-width="8"/>
+<line x1="90" y1="228" x2="520" y2="228" stroke="#e2e2e6" stroke-width="8"/>
+<line x1="90" y1="252" x2="490" y2="252" stroke="#e2e2e6" stroke-width="8"/>
+<line x1="90" y1="276" x2="460" y2="276" stroke="#e2e2e6" stroke-width="8"/>
+<line x1="60" y1="322" x2="1140" y2="322" stroke="#e2e2e6" stroke-width="1"/>
+<rect x="60" y="322" width="1080" height="298" rx="0" fill="#1e1e20"/>
+<text x="76" y="344" font-family="'Helvetica Neue', Arial, sans-serif" font-size="11" font-weight="700" fill="#9a9a9e" text-anchor="start">▸  Console</text>
+<text x="76" y="372" font-family="'SF Mono', Menlo, monospace" font-size="11" font-weight="400" fill="#7a7a80" text-anchor="start">2026-09-21 10:02:11.128</text>
+<text x="300" y="372" font-family="'SF Mono', Menlo, monospace" font-size="12.5" font-weight="400" fill="#d6d6da" text-anchor="start">[ARSession] session(_:cameraDidChangeTrackingState:) → .normal</text>
+<text x="76" y="396" font-family="'SF Mono', Menlo, monospace" font-size="11" font-weight="400" fill="#7a7a80" text-anchor="start">2026-09-21 10:02:14.902</text>
+<text x="300" y="396" font-family="'SF Mono', Menlo, monospace" font-size="12.5" font-weight="600" fill="#5fd77a" text-anchor="start">포스터 인식 완료: 포스터</text>
+<text x="76" y="420" font-family="'SF Mono', Menlo, monospace" font-size="11" font-weight="400" fill="#7a7a80" text-anchor="start">2026-09-21 10:02:14.905</text>
+<text x="300" y="420" font-family="'SF Mono', Menlo, monospace" font-size="12.5" font-weight="600" fill="#5fd77a" text-anchor="start">영상 파일 발견: 토이스토리.mov</text>
+<text x="76" y="444" font-family="'SF Mono', Menlo, monospace" font-size="11" font-weight="400" fill="#7a7a80" text-anchor="start">2026-09-21 10:02:14.911</text>
+<text x="300" y="444" font-family="'SF Mono', Menlo, monospace" font-size="12.5" font-weight="600" fill="#5fd77a" text-anchor="start">영상 재생 시작</text>
+<rect x="300" y="452" width="8" height="14" rx="0" fill="#5fd77a" opacity="0.9"/>
+</svg>

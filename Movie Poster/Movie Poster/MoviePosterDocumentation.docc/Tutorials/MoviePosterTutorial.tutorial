@@ -8,9 +8,15 @@
 
         **따라가는 방법.** 각 단계의 코드 블록은 바로 앞 단계의 코드 위에 몇 줄을 더한 것입니다. 초록색으로 표시된 줄만 새로 입력하면 되고, 지우는 줄은 없습니다. 처음부터 끝까지 위에서 아래로 따라가면 마지막 단계의 코드가 곧 완성된 `ARViewContainer.swift`입니다.
 
-        **예상 소요 시간:** Swift와 Xcode가 처음인 분 기준 약 60분입니다.
+        **예상 소요 시간:** Swift와 Xcode가 처음인 분 기준 약 60~90분입니다(기기 서명이 처음이면 조금 더 걸릴 수 있습니다).
 
         **선행 지식:** Xcode에서 프로젝트를 열고, 프로젝트 내비게이터에서 파일을 고르고, 코드를 입력한 뒤 빌드 버튼(▶︎)을 누르는 방법만 알면 됩니다. Swift 문법이나 ARKit을 미리 알 필요는 없습니다.
+
+        > Important: 이 앱은 카메라를 사용하는 AR 앱이라 **Simulator(가상 기기)에서는 실행할 수 없습니다.** 처음부터 끝까지 실제 iPhone 또는 iPad가 필요합니다.
+        >
+        > - 기기를 케이블로 Mac에 연결할 수 있어야 합니다.
+        > - 앱을 기기에 설치하려면 Apple ID로 Xcode에 로그인돼 있어야 합니다(유료 개발자 계정이 아니어도, 무료 Apple ID로 충분합니다).
+        > - 기기 연결과 서명(로그인) 설정 방법은 1번 섹션에서 자세히 안내합니다.
 
         > Note: 이 튜토리얼은 예시로 영화 <토이 스토리>의 포스터 이미지(`토이스토리 포스터.jpeg`)와 예고편 영상(`토이스토리.mov`)을 사용합니다. 실습자는 이 파일을 그대로 써도 되고, 원하는 다른 영화의 포스터·영상으로 바꿔서 진행해도 됩니다.
         >
@@ -45,7 +51,24 @@
 
                 📍 Xcode 프로젝트 자체를 만드는 단계라 아직 코드는 없습니다.
 
-                @Image(source: "01-swiftui-arview.svg", alt: "새 Xcode 프로젝트에서 App 템플릿과 SwiftUI 인터페이스를 선택하는 화면")
+                @Image(source: "xc-new-project-template.svg", alt: "Xcode 새 프로젝트 템플릿 화면. App이 선택돼 있고 Augmented Reality App에는 선택하지 말라는 표시가 있다")
+            }
+
+            @Step {
+                이 앱은 카메라를 쓰는 AR 앱이라 Simulator(가상 기기)에서는 제대로 실행되지 않습니다. 지금 실제 iPhone 또는 iPad를 연결하고, 앱을 기기에 설치할 수 있도록 서명을 설정해 둡니다.
+
+                1. iPhone(또는 iPad)을 케이블로 Mac에 연결합니다. 기기에 "이 컴퓨터를 신뢰하시겠습니까?"가 뜨면 **신뢰**를 누릅니다.
+                2. 프로젝트 내비게이터 맨 위, 파란 프로젝트 아이콘(**Movie Poster**)을 클릭합니다.
+                3. **TARGETS** 목록에서 **Movie Poster**를 선택하고, 위쪽 탭에서 **Signing & Capabilities**를 클릭합니다.
+                4. **Automatically manage signing**을 체크하고, **Team**에서 본인의 Apple ID를 선택합니다. 목록에 없다면 **Add an Account…**로 로그인합니다.
+
+                - 유료 개발자 계정이 없어도 괜찮습니다. 무료 Apple ID(Personal Team)로도 실기기 실행이 가능합니다.
+                - 다만 무료 계정으로 서명한 앱은 7일이 지나면 다시 실행해 재서명해야 할 수 있습니다.
+                - Xcode 상단 실행 대상 메뉴에 방금 연결한 기기 이름이 보이면 준비가 끝난 것입니다. 실제로 실행해보는 건 8번 섹션에서 합니다.
+
+                📍 Xcode 프로젝트 설정 화면에서 하는 작업이라 코드는 그대로입니다.
+
+                @Image(source: "xc-signing-capabilities.svg", alt: "Signing & Capabilities 탭에서 Team에 본인의 Apple ID를 선택하는 화면")
             }
 
             @Step {
@@ -65,7 +88,7 @@
 
                 📍 이 단계는 파일을 옮기는 준비 작업이라 아직 입력할 코드는 없습니다.
 
-                @Image(source: "01-swiftui-arview.svg", alt: "튜토리얼에서 준비할 포스터와 영상 파일")
+                @Image(source: "xc-drag-video-file.svg", alt: "영상 파일을 프로젝트 내비게이터로 드래그하고 Copy items if needed를 체크하는 화면")
             }
 
             @Step {
@@ -81,7 +104,7 @@
                 📍 `ARViewContainer.swift` 파일 전체를 이 코드로 채웁니다.
 
                 @Code(name: "ARViewContainer.swift", file: "av-s1-2.swift", reset: true) {
-                    @Image(source: "01-swiftui-arview.svg", alt: "ARViewContainer가 ARView를 생성하는 모습")
+                    @Image(source: "xc-new-swift-file.svg", alt: "New File 대화상자에서 Swift File을 고르고 파일 이름을 ARViewContainer로 저장하는 화면")
                 }
             }
 
@@ -105,7 +128,7 @@
                 - `ARViewContainer()`로 우리가 만든 뷰를 불러옵니다.
                 - `.ignoresSafeArea()`를 붙이면 카메라 화면이 노치·홈 인디케이터 영역까지 화면 전체를 채웁니다.
 
-                지금 빌드하면 검은 화면이나 카메라 영상만 보이는 게 정상입니다. 아직 포스터 인식 코드가 없기 때문입니다.
+                지금 빌드하면 검은 화면이나 카메라 영상만 보이는 게 정상입니다. 아직 포스터 인식 코드가 없기 때문입니다. (실행 대상은 Simulator가 아니라, 앞서 연결하고 서명해 둔 실제 기기를 선택하세요.)
 
                 📍 `ContentView.swift`의 `struct ContentView` 안, `var body: some View {` 다음 줄입니다.
 
@@ -136,7 +159,7 @@
 
                 📍 에셋 카탈로그에서 하는 작업이라 코드는 아직 그대로입니다.
 
-                @Image(source: "02-reference-image.svg", alt: "Assets.xcassets에 새 AR Resource Group을 추가하는 화면")
+                @Image(source: "xc-assets-new-ar-group.svg", alt: "Assets.xcassets 하단 + 버튼 메뉴에서 New AR Resource Group을 선택하는 화면")
             }
 
             @Step {
@@ -149,7 +172,7 @@
 
                 📍 에셋 카탈로그에서 하는 작업이라 코드는 아직 그대로입니다.
 
-                @Image(source: "02-reference-image.svg", alt: "AR Resources 그룹에 포스터를 추가하는 화면")
+                @Image(source: "xc-assets-drag-poster.svg", alt: "AR Resources 그룹 안으로 포스터 이미지를 드래그하고 Copy items if needed를 체크하는 화면")
             }
 
             @Step {
@@ -176,7 +199,7 @@
 
                 📍 인스펙터의 Width 칸 하나만 수정합니다. 코드 변경은 없습니다.
 
-                @Image(source: "02-physical-size.svg", alt: "참조 이미지의 실제 물리 크기를 입력하는 화면")
+                @Image(source: "xc-file-inspector-width.svg", alt: "File Inspector의 Physical Size 항목에서 Width 칸에 값을 입력하는 화면")
             }
 
             @Step {
@@ -315,7 +338,7 @@
 
                 📍 Xcode의 Info 탭에서 하는 프로젝트 설정입니다. 코드는 그대로입니다.
 
-                @Image(source: "03-session-order.svg", alt: "Info 탭에 카메라 권한 설명을 추가하는 화면")
+                @Image(source: "xc-info-camera-usage.svg", alt: "TARGETS의 Movie Poster를 고르고 Info 탭에서 Privacy - Camera Usage Description 행을 추가하는 화면")
             }
         }
     }
@@ -484,18 +507,30 @@
             }
 
             @Step {
-                왼쪽·오른쪽·위·아래 네 벽을 만듭니다.
+                포털 벽 4장을 만들기 전에, 사각형 한 장을 그려 주는 도우미 함수 `makePanel(corners:material:)`을 먼저 추가합니다.
 
-                - `makePanel(corners:material:)` 도우미 함수를 호출합니다.
-                - 각 벽은 뒤쪽 두 모서리(안쪽)와 앞쪽 두 모서리(포스터 면)를 이어 만든 사각형 한 장입니다.
-                - `makePanel` 함수 자체도 이 단계에서 함께 추가합니다.
+                - 네 꼭짓점(모서리) 좌표를 넘겨받아, 그 네 점을 잇는 평평한 사각형 하나를 만듭니다.
+                - `MeshDescriptor`로 꼭짓점을 직접 지정하고, 앞면·뒷면에 모두 삼각형을 그려서 어느 방향에서 봐도 사각형이 보이게 합니다.
 
-                이 함수는 `MeshDescriptor`로 네 꼭짓점을 직접 지정해 사각형 하나를 만들고, 앞뒤 양쪽에서 다 보이도록 삼각형을 앞면·뒷면 모두 그립니다.
+                아직 이 함수를 호출하는 코드는 없습니다. 다음 단계에서 이 함수를 네 번 불러 벽 4장을 만듭니다.
 
-                📍 네 개의 `let …Frame = makePanel(...)` 호출은 `frameMaterial` 아래에, `makePanel` 함수는 `createPortal` 함수가 끝난 뒤 `Coordinator` 클래스 안에 넣습니다.
+                📍 `createPortal` 함수가 끝난 뒤, `Coordinator` 클래스 안에 넣습니다.
 
-                @Code(name: "ARViewContainer.swift", file: "av-s5-5.swift", previousFile: "av-s5-4.swift") {
-                    @Image(source: "05-depth.svg", alt: "네 개의 벽 패널과 makePanel 도우미 함수")
+                @Code(name: "ARViewContainer.swift", file: "av-s5-4b.swift", previousFile: "av-s5-4.swift") {
+                    @Image(source: "05-depth.svg", alt: "사각형 패널 하나를 만드는 makePanel 도우미 함수")
+                }
+            }
+
+            @Step {
+                이제 방금 만든 `makePanel` 함수를 네 번 호출해 왼쪽·오른쪽·위·아래 벽을 만듭니다.
+
+                - 네 벽 모두 만드는 방식은 같습니다: 뒤쪽 두 모서리(안쪽)와 앞쪽 두 모서리(포스터 면)를 이어 사각형 한 장을 만듭니다.
+                - 벽마다 좌표의 부호(+/-)만 다릅니다. 아래 코드를 그대로 옮겨 적으면 됩니다.
+
+                📍 네 개의 `let …Frame = makePanel(...)` 호출은 `frameMaterial` 아래에 넣습니다.
+
+                @Code(name: "ARViewContainer.swift", file: "av-s5-5.swift", previousFile: "av-s5-4b.swift") {
+                    @Image(source: "05-depth.svg", alt: "makePanel을 네 번 호출해 벽 4장을 만드는 코드")
                 }
             }
 
@@ -582,18 +617,32 @@
             }
 
             @Step {
-                방금 정한 크기로 영상 면을 만들어 포털에 붙입니다.
+                영상을 표시할 면을 만들기 전에, 도우미 함수 `makeVerticalVideoMesh(width:height:)`를 먼저 추가합니다.
 
-                1. `makeVerticalVideoMesh(width:height:)`로 x-z 평면에 면 하나만 만듭니다(기본 Box는 6면이라 천장·바닥이 보일 수 있어 직접 만듭니다).
+                - RealityKit의 기본 `Box`는 6면을 가진 상자라서, 영상을 입히면 천장·바닥 면까지 함께 보일 수 있습니다.
+                - 이 함수는 상자 대신 x-z 평면(세로로 선 면) 하나만 만들어, 딱 영상 화면처럼 납작하게 만듭니다.
+                - 앞면·뒷면을 모두 만들어서, 카메라가 어느 쪽에 있어도 영상이 보이게 합니다.
+
+                아직 이 함수를 호출하는 코드는 없습니다. 다음 단계에서 이 함수로 실제 영상 면을 만들어 붙입니다.
+
+                📍 `Coordinator` 클래스 안, `makePanel` 함수 다음에 넣습니다.
+
+                @Code(name: "ARViewContainer.swift", file: "av-s6-4b.swift", previousFile: "av-s6-4.swift") {
+                    @Image(source: "06-play.svg", alt: "영상 표시용 평면 하나를 만드는 makeVerticalVideoMesh 함수")
+                }
+            }
+
+            @Step {
+                이제 방금 만든 함수로 실제 영상 면을 만들어 포털에 붙이고 재생을 시작합니다.
+
+                1. `makeVerticalVideoMesh(width:height:)`로 영상 크기에 맞는 면을 만듭니다.
                 2. `ModelEntity`에 `videoMaterial`을 입혀 `anchorEntity`의 자식으로 추가합니다.
                 3. 위치를 포털 가장 안쪽(`y = -depth + 0.003`)에 둡니다.
                 4. `player.play()`로 재생을 시작합니다.
 
-                `makeVerticalVideoMesh` 도우미 함수도 이 단계에서 함께 추가합니다.
+                📍 영상 크기 `if/else` 아래에 면·Entity 코드를 넣습니다.
 
-                📍 영상 크기 `if/else` 아래에 면·Entity 코드를, `makeVerticalVideoMesh` 함수는 `Coordinator` 클래스 안 도우미 함수들 옆에 넣습니다.
-
-                @Code(name: "ARViewContainer.swift", file: "av-s6-5.swift", previousFile: "av-s6-4.swift") {
+                @Code(name: "ARViewContainer.swift", file: "av-s6-5.swift", previousFile: "av-s6-4b.swift") {
                     @Image(source: "06-play.svg", alt: "영상 면을 만들어 붙이고 재생하는 코드")
                 }
             }
@@ -671,13 +720,17 @@
 
         @Steps {
             @Step {
-                Xcode 상단 실행 대상 메뉴에서 연결한 실제 iPhone 또는 iPad를 선택하고 ▶︎로 실행합니다.
+                Xcode 상단 실행 대상 메뉴에서 1번 섹션에서 연결·서명해 둔 실제 iPhone 또는 iPad를 선택하고 ▶︎로 실행합니다.
 
-                처음 실행이면 기기에서 개발자 신뢰 설정이 필요할 수 있습니다.
+                처음 실행이면 기기에서 앱이 바로 열리지 않고 "신뢰할 수 없는 개발자"라는 경고가 뜰 수 있습니다. 그럴 때는:
+
+                1. 기기의 **설정 → 일반 → VPN 및 기기 관리**로 이동합니다.
+                2. **개발자 앱** 항목에서 본인의 Apple ID를 찾아 탭하고 **신뢰**를 누릅니다.
+                3. 다시 Xcode에서 ▶︎를 눌러 실행합니다.
 
                 📍 코드는 완성 상태 그대로 둡니다.
 
-                @Image(source: "08-device-test.svg", alt: "실행 대상으로 실제 기기를 선택하는 화면")
+                @Image(source: "xc-run-destination.svg", alt: "Xcode 상단 실행 대상 메뉴에서 연결된 실제 iPhone을 선택하는 화면")
             }
 
             @Step {
@@ -707,7 +760,7 @@
 
                 📍 콘솔 로그로 인식 여부를 확인하는 단계입니다.
 
-                @Image(source: "08-recognition.svg", alt: "포스터 전체를 카메라에 담아 인식시키는 모습")
+                @Image(source: "xc-console-log.svg", alt: "Xcode 콘솔에 포스터 인식 완료 로그가 찍히는 화면")
             }
 
             @Step {

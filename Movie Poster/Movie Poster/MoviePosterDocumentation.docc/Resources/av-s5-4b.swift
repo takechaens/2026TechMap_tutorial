@@ -1,0 +1,157 @@
+import SwiftUI
+import RealityKit
+import ARKit
+
+/// SwiftUI 화면 안에 UIKit 기반의 ARView를 넣기 위한 연결 코드입니다.
+///
+/// SwiftUI는 선언형 UI 프레임워크이고, ARView는 UIKit/RealityKit 객체입니다.
+/// UIViewRepresentable을 사용하면 SwiftUI 안에서 ARView를 사용할 수 있습니다.
+struct ARViewContainer: UIViewRepresentable {
+    // Coordinator는 ARSessionDelegate 역할을 담당합니다.
+    // SwiftUI가 UIViewRepresentable을 만들 때 이 객체도 함께 생성합니다.
+    func makeCoordinator() -> Coordinator { Coordinator() }
+
+    // ARView가 화면에 처음 만들어질 때 한 번 호출됩니다.
+    func makeUIView(context: Context) -> ARView {
+        // 카메라 화면과 RealityKit 콘텐츠를 표시할 ARView를 만듭니다.
+        let arView = ARView(frame: .zero)
+        let coordinator = context.coordinator
+        coordinator.arView = arView
+
+        // 이미지 추적은 모든 기기에서 지원되는 기능이 아니므로 먼저 확인합니다.
+        guard ARImageTrackingConfiguration.isSupported else {
+            print("이 기기는 이미지 추적을 지원하지 않습니다.")
+            return arView
+        }
+
+        // Xcode의 Assets.xcassets 안에 있는
+        // 'AR Resources' 그룹에서 참조 이미지를 읽어옵니다.
+        // 여기에는 인식할 영화 포스터가 등록되어 있어야 합니다.
+        guard let referenceImages = ARReferenceImage.referenceImages(
+            inGroupNamed: "AR Resources", bundle: nil
+        ) else {
+            print("AR Resources 그룹을 찾을 수 없습니다.")
+            return arView
+        }
+
+        // ARImageTrackingConfiguration은
+        // “카메라로 특정 2D 이미지를 찾아 추적하겠다”는 ARKit 설정입니다.
+        let configuration = ARImageTrackingConfiguration()
+        configuration.trackingImages = referenceImages
+        // 동시에 추적할 포스터의 최대 개수입니다.
+        configuration.maximumNumberOfTrackedImages = 1
+
+        // ARSession은 카메라에서 얻은 AR 정보를 계속 처리합니다.
+        // delegate를 통해 이미지가 발견되는 시점을 전달받습니다.
+        // 첫 번째 앵커를 놓치지 않도록 run보다 먼저 delegate를 설정합니다.
+        arView.session.delegate = coordinator
+
+        // ARSession을 실제로 시작합니다.
+        // resetTracking: 이전 추적 정보를 지웁니다.
+        // removeExistingAnchors: 이전에 추가한 앵커를 제거합니다.
+        arView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
+        return arView
+    }
+
+    // SwiftUI 상태가 바뀔 때 호출됩니다.
+    // 현재 화면은 ARSession이 직접 관리하므로 별도 업데이트가 필요 없습니다.
+    func updateUIView(_ uiView: ARView, context: Context) {}
+
+    // ARKit 이벤트를 받는 객체입니다.
+    final class Coordinator: NSObject, ARSessionDelegate {
+        // ARView를 강하게 잡으면 순환 참조가 생길 수 있으므로 weak로 보관합니다.
+        weak var arView: ARView?
+
+        // 포스터가 계속 인식될 때 포털이 여러 개 생기는 것을 막습니다.
+        private var portalWasAdded = false
+
+
+        // ARKit이 새로운 앵커를 발견했을 때 호출합니다.
+        // ARImageAnchor는 “참조 이미지가 실제 공간에서 발견되었다”는 뜻입니다.
+        func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
+            guard !portalWasAdded else { return }
+
+            for anchor in anchors {
+                // 여러 종류의 ARAnchor 중에서 이미지 앵커만 사용합니다.
+                guard let imageAnchor = anchor as? ARImageAnchor else { continue }
+                print("포스터 인식 완료: \(imageAnchor.referenceImage.name ?? "이름 없음")")
+
+                // 이미지 앵커의 위치와 방향을 기준으로 3D 포털을 만듭니다.
+                if createPortal(on: imageAnchor) {
+                    portalWasAdded = true
+                }
+                break
+            }
+        }
+
+        @discardableResult
+        /// 이미지 앵커에 영상 화면과 포털 프레임을 추가합니다.
+        /// 반환값은 포털 생성에 성공했는지 여부입니다.
+        private func createPortal(on imageAnchor: ARImageAnchor) -> Bool {
+            guard let arView else { return false }
+
+
+            // 참조 이미지에 설정한 실제 물리 크기입니다.
+            // 이 값이 있어야 포스터의 실제 크기에 맞춰 3D 객체를 배치할 수 있습니다.
+            let size = imageAnchor.referenceImage.physicalSize
+            let width = Float(size.width)
+            let height = Float(size.height)
+
+            // 이미지 앵커에서 포스터 면은 x-z 평면입니다.
+            // x = 가로, z = 세로, y = 포스터 앞/뒤 깊이 방향입니다.
+            // 포털의 안쪽은 -y 방향으로 뻗게 만듭니다.
+            let depth: Float = 0.20
+
+            // AnchorEntity는 ARImageAnchor의 위치·회전·추적 상태를 따라갑니다.
+            // 여기에 자식 Entity를 넣으면 포스터에 붙어 있는 것처럼 움직입니다.
+            let anchorEntity = AnchorEntity(anchor: imageAnchor)
+
+            // OcclusionMaterial은 물체를 “보이지 않게 가리는” 용도입니다.
+            // 학습 단계에서 포털 테두리를 눈으로 확인할 수 있도록
+            // 여기서는 검은색 SimpleMaterial을 사용합니다.
+            let frameMaterial = SimpleMaterial(color: .black, isMetallic: false)
+
+            // 관람자 쪽으로 갈수록 벽이 바깥으로 벌어지는 거리입니다.
+            // 뒤쪽 모서리는 영상 화면에 정확히 붙고, 앞쪽 모서리만 확장됩니다.
+            let flare: Float = 0.10
+
+            // 네 패널은 모두 같은 뒤쪽 네 모서리에서 시작합니다.
+            // 그래서 영상 화면과 벽 사이에 틈이 생기지 않습니다.
+            let backY = -depth
+            let frontY: Float = 0
+            let backHalfWidth = width / 2
+            let backHalfHeight = height / 2
+            let frontHalfWidth = backHalfWidth + flare
+            let frontHalfHeight = backHalfHeight + flare
+
+
+            // 만든 앵커를 RealityKit 장면에 추가해야 실제 화면에 렌더링됩니다.
+            arView.scene.addAnchor(anchorEntity)
+
+            return true
+        }
+
+        // 네 꼭짓점을 연결한 벽 패널을 만듭니다.
+        // 앞·뒤 양쪽 방향에서 보이도록 삼각형의 앞뒤 면을 모두 추가합니다.
+        private func makePanel(
+            corners: [SIMD3<Float>],
+            material: SimpleMaterial
+        ) -> ModelEntity {
+            var descriptor = MeshDescriptor()
+            descriptor.positions = MeshBuffer(corners)
+            let normal = simd_normalize(
+                simd_cross(corners[1] - corners[0], corners[2] - corners[0])
+            )
+            descriptor.normals = MeshBuffer(Array(repeating: normal, count: corners.count))
+            descriptor.primitives = .triangles([
+                0, 1, 2, 0, 2, 3,
+                2, 1, 0, 3, 2, 0
+            ])
+
+            let mesh = (try? MeshResource.generate(from: [descriptor]))
+                ?? MeshResource.generateBox(width: 0.001, height: 0.001, depth: 0.001)
+            return ModelEntity(mesh: mesh, materials: [material])
+        }
+
+    }
+}

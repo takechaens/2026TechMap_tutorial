@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750">
+<rect width="1200" height="750" fill="#eceef1"/>
+<rect x="44" y="38" width="900" height="690" rx="12" fill="#000000" opacity="0.1"/>
+<rect x="40" y="30" width="900" height="690" rx="12" fill="#fcfcfd" stroke="#d3d3d8" stroke-width="1"/>
+<clipPath id="clip-40-30"><rect x="40" y="30" width="900" height="690" rx="12"/></clipPath>
+<g clip-path="url(#clip-40-30)">
+<rect x="40" y="30" width="900" height="34" rx="0" fill="#e7e7ea"/>
+<circle cx="62" cy="47.0" r="6" fill="#ff5f57"/>
+<circle cx="82" cy="47.0" r="6" fill="#febc2e"/>
+<circle cx="102" cy="47.0" r="6" fill="#28c840"/>
+<text x="490.0" y="52.0" font-family="'Helvetica Neue', Arial, sans-serif" font-size="13" font-weight="600" fill="#6e6e73" text-anchor="middle">Movie Poster — Assets.xcassets</text>
+<rect x="40" y="64" width="900" height="38" rx="0" fill="#f0f0f3"/>
+<line x1="40" y1="102" x2="940" y2="102" stroke="#e2e2e6" stroke-width="1"/>
+<circle cx="66" cy="83.0" r="11" fill="#c9c9cd"/>
+<path d="M62 77.0 L62 89.0 L71 83.0 Z" fill="#5a5a5e"/>
+<circle cx="94" cy="83.0" r="11" fill="#dadade"/>
+<rect x="89" y="78.0" width="10" height="10" rx="2" fill="#8e8e93"/>
+<rect x="124" y="72.0" width="210" height="22" rx="5" fill="#e5e5e9"/>
+<text x="134" y="87.0" font-family="'Helvetica Neue', Arial, sans-serif" font-size="11" font-weight="600" fill="#1d1d1f" text-anchor="start">Movie Poster &gt; 채은&#x27;s iPhone</text>
+</g>
+<rect x="40" y="102" width="240" height="584" rx="0" fill="#f5f5f7"/>
+<line x1="280" y1="102" x2="280" y2="686" stroke="#dedee2" stroke-width="1"/>
+<rect x="54" y="121" width="13" height="13" rx="3" fill="#8e8e93"/>
+<text x="60.5" y="130.5" font-family="'Helvetica Neue', Arial, sans-serif" font-size="9" font-weight="700" fill="#ffffff" text-anchor="middle">S</text>
+<text x="74" y="131" font-family="'Helvetica Neue', Arial, sans-serif" font-size="12.5" font-weight="400" fill="#1d1d1f" text-anchor="start">AppIcon</text>
+<rect x="54" y="145" width="13" height="13" rx="3" fill="#8e8e93"/>
+<text x="60.5" y="154.5" font-family="'Helvetica Neue', Arial, sans-serif" font-size="9" font-weight="700" fill="#ffffff" text-anchor="middle">S</text>
+<text x="74" y="155" font-family="'Helvetica Neue', Arial, sans-serif" font-size="12.5" font-weight="400" fill="#1d1d1f" text-anchor="start">AccentColor</text>
+<rect x="44" y="164" width="232" height="22" rx="5" fill="#0a84ff"/>
+<path d="M54 179 h6 l2 3 h8 v6 h-16 z" fill="#6fb1fc"/>
+<text x="74" y="179" font-family="'Helvetica Neue', Arial, sans-serif" font-size="12.5" font-weight="400" fill="#ffffff" text-anchor="start">AR Resources</text>
+<rect x="40" y="686" width="240" height="34" rx="0" fill="#eceef1"/>
+<line x1="40" y1="686" x2="280" y2="686" stroke="#dedee2" stroke-width="1"/>
+<circle cx="60" cy="703" r="10" fill="#ffffff"/>
+<circle cx="60" cy="703" r="10" fill="none" stroke="#9a9a9e" stroke-width="1.3"/>
+<text x="60" y="707" font-family="'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="700" fill="#48484a" text-anchor="middle">+</text>
+<rect x="62" y="520" width="230" height="166" rx="8" fill="#000000" opacity="0.18"/>
+<rect x="60" y="516" width="230" height="166" rx="8" fill="#ffffff" stroke="#d8d8dc" stroke-width="1"/>
+<text x="76" y="540" font-family="'Helvetica Neue', Arial, sans-serif" font-size="12.5" font-weight="400" fill="#1d1d1f" text-anchor="start">New Folder</text>
+<text x="76" y="566" font-family="'Helvetica Neue', Arial, sans-serif" font-size="12.5" font-weight="400" fill="#1d1d1f" text-anchor="start">New Sprite Atlas</text>
+<text x="76" y="592" font-family="'Helvetica Neue', Arial, sans-serif" font-size="12.5" font-weight="400" fill="#1d1d1f" text-anchor="start">New Color Set</text>
+<text x="76" y="618" font-family="'Helvetica Neue', Arial, sans-serif" font-size="12.5" font-weight="400" fill="#1d1d1f" text-anchor="start">New Image Set</text>
+<text x="76" y="644" font-family="'Helvetica Neue', Arial, sans-serif" font-size="12.5" font-weight="400" fill="#1d1d1f" text-anchor="start">New Data Set</text>
+<rect x="64" y="654" width="222" height="24" rx="4" fill="#0a84ff"/>
+<text x="76" y="670" font-family="'Helvetica Neue', Arial, sans-serif" font-size="12.5" font-weight="600" fill="#ffffff" text-anchor="start">New AR Resource Group</text>
+<path d="M100 680 l10 8 l10 -8 z" fill="none"/>
+<text x="320" y="152" font-family="'Helvetica Neue', Arial, sans-serif" font-size="20" font-weight="700" fill="#1d1d1f" text-anchor="start">AR Resources</text>
+<rect x="320" y="182" width="220" height="150" rx="8" fill="#f2f2f5" stroke="#d8d8dc" stroke-width="1" opacity="0.7"/>
+<text x="430" y="267" font-family="'Helvetica Neue', Arial, sans-serif" font-size="13" font-weight="400" fill="#98989d" text-anchor="middle">이미지를 여기로 드래그</text>
+</svg>
