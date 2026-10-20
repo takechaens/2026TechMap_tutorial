@@ -54,7 +54,7 @@
 
                 📍 Xcode 프로젝트 자체를 만드는 단계라 아직 코드는 없습니다.
 
-                @Image(source: "xc-new-project-template.png", alt: "실제 Xcode 새 프로젝트 템플릿 화면. iOS와 App이 선택돼 있다")
+                @Image(source: "xc-new-project-template-actual.png", alt: "실제 Xcode 새 프로젝트 템플릿 화면. iOS와 App이 선택돼 있다")
             }
 
             @Step {
