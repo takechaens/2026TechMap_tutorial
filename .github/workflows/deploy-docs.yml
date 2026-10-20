@@ -30,7 +30,7 @@ jobs:
       - name: Build DocC archive
         run: |
           xcodebuild docbuild \
-            -project "Movie Poster/Movie Poster.xcodeproj" \
+            -project "Movie Poster/Movie Poster tutorial.xcodeproj" \
             -scheme "Movie Poster" \
             -destination 'generic/platform=iOS' \
             -derivedDataPath "$RUNNER_TEMP/DerivedData" \
