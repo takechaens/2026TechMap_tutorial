@@ -129,7 +129,7 @@
                 📍 `ARViewContainer.swift` 파일 전체를 이 코드로 채웁니다.
 
                 @Code(name: "ARViewContainer.swift", file: "av-s1-2.swift", reset: true) {
-                    @Image(source: "xc-new-swift-file.svg", alt: "New File 대화상자에서 Swift File을 고르고 파일 이름을 ARViewContainer로 저장하는 화면")
+                    @Image(source: "xc-new-swift-file.png", alt: "실제 Xcode의 New File 대화상자에서 Swift File을 고른 화면")
                 }
             }
 
