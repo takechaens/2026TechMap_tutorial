@@ -58,7 +58,7 @@
             }
 
             @Step {
-                **Choose options for your new project** 화면에서 프로젝트의 기본 정보를 설정합니다.
+                **Choose options for your new project** 화면에서 프로젝트의 기본 정보를 설정합니다. 이 화면은 스텝 1에서 **App**을 선택하고 **Next**를 눌렀을 때 나타납니다.
 
                 - **Product Name**에는 `Movie Poster`를 입력합니다. 이 이름이 프로젝트와 앱 이름으로 사용됩니다.
                 - **Team**은 지금 `None`으로 두어도 됩니다. 실제 기기에서 실행하기 전인 다음 단계에서 Apple ID Team을 설정합니다.
@@ -67,28 +67,33 @@
                 - **Interface**는 **SwiftUI**, **Language**는 **Swift**로 둡니다.
                 - **Testing System**과 **Storage**는 각각 **None**으로 둡니다. **Host in CloudKit**은 선택하지 않습니다.
 
-                설정을 확인한 뒤 **Next**를 누르고 저장 위치를 선택한 다음 **Create**를 누릅니다.
+                설정을 확인한 뒤 **Next**를 누르고 저장 위치를 선택한 다음 **Create**를 누릅니다. 그러면 Xcode가 새 프로젝트의 메인 화면을 엽니다. 이제 스텝 2는 끝났습니다.
 
                 > Check Point: 이 화면에 보이는 `Team`, `Organization Identifier`, `Bundle Identifier`는 사람마다 다를 수 있습니다. 문서 이미지의 값을 그대로 복사하는 것이 아니라, 위 설명대로 자신의 프로젝트에 맞는 값을 입력하세요. 특히 `Bundle Identifier`가 회색으로 자동 생성되고 있는지 확인합니다.
 
-                📍 이 화면은 1번 스텝에서 **App**을 선택하고 **Next**를 눌렀을 때 나타납니다. 아래 프리뷰에서는 개인정보가 될 수 있는 식별자 값을 지워 두었습니다.
+                📍 이 화면에서 설정을 마친 뒤 **Create**를 누르는 것이 이 스텝의 마지막 작업입니다. 아래 프리뷰에서는 개인정보가 될 수 있는 식별자 값을 지워 두었습니다.
 
                 @Image(source: "xc-new-project-options.png", alt: "개인 식별자 값을 지운 Xcode 새 프로젝트 옵션 설정 화면")
             }
 
             @Step {
-                이 앱은 카메라를 쓰는 AR 앱이라 Simulator(가상 기기)에서는 제대로 실행되지 않습니다. 지금 실제 iPhone 또는 iPad를 연결하고, 앱을 기기에 설치할 수 있도록 서명을 설정해 둡니다.
+                이제 스텝 2에서 **Create**를 눌러 프로젝트가 생성된 뒤 나타난 **Xcode 프로젝트 메인 화면**에서 작업합니다. 이 스텝에서는 코드를 입력하지 않고, 실제 iPhone 또는 iPad에서 앱을 실행할 수 있도록 서명(Signing)을 설정합니다. 스텝 2의 **Choose options for your new project** 화면으로 돌아가는 것이 아닙니다.
+
+                이 앱은 카메라를 쓰는 AR 앱이라 Simulator(가상 기기)에서는 제대로 실행되지 않습니다. 따라서 먼저 실제 기기를 연결한 뒤 아래 설정을 진행합니다.
 
                 1. iPhone(또는 iPad)을 케이블로 Mac에 연결합니다. 기기에 "이 컴퓨터를 신뢰하시겠습니까?"가 뜨면 **신뢰**를 누릅니다.
-                2. 프로젝트 내비게이터 맨 위, 파란 프로젝트 아이콘(**Movie Poster**)을 클릭합니다.
-                3. **TARGETS** 목록에서 **Movie Poster**를 선택하고, 위쪽 탭에서 **Signing & Capabilities**를 클릭합니다.
-                4. **Automatically manage signing**을 체크하고, **Team**에서 본인의 Apple ID를 선택합니다. 목록에 없다면 **Add an Account…**로 로그인합니다.
+                2. Xcode 왼쪽 **Project navigator** 맨 위의 파란 프로젝트 아이콘(**Movie Poster**)을 클릭합니다.
+                3. 가운데에 프로젝트 설정 화면이 나타나면 왼쪽 **TARGETS** 목록에서 **Movie Poster**를 선택합니다.
+                4. 위쪽 탭에서 **Signing & Capabilities**를 클릭합니다.
+                5. **Automatically manage signing**을 체크하고, **Team**에서 본인의 Apple ID를 선택합니다. 목록에 없다면 **Add an Account…**로 로그인합니다.
 
                 - 유료 개발자 계정이 없어도 괜찮습니다. 무료 Apple ID(Personal Team)로도 실기기 실행이 가능합니다.
                 - 다만 무료 계정으로 서명한 앱은 7일이 지나면 다시 실행해 재서명해야 할 수 있습니다.
                 - Xcode 상단 실행 대상 메뉴에 방금 연결한 기기 이름이 보이면 준비가 끝난 것입니다. 실제로 실행해보는 건 8번 섹션에서 합니다.
 
-                📍 Xcode 프로젝트 설정 화면에서 하는 작업이라 코드는 그대로입니다.
+                > Check Point: 화면 왼쪽에 파일 목록만 보이고 **TARGETS**가 보이지 않는다면 파란 프로젝트 아이콘을 아직 선택하지 않은 상태입니다. 왼쪽 맨 위의 **Movie Poster** 프로젝트 아이콘을 다시 클릭하세요. 올바른 화면에서는 가운데에 **PROJECT**와 **TARGETS**가 함께 표시됩니다.
+
+                📍 이 스텝의 화면은 **Signing & Capabilities** 탭입니다. 여기서 Team을 선택하면 됩니다. 코드는 수정하지 않습니다.
 
                 @Image(source: "xc-signing-capabilities.svg", alt: "Signing & Capabilities 탭에서 Team에 본인의 Apple ID를 선택하는 화면")
             }
