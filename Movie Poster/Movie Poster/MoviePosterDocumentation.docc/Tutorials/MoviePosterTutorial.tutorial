@@ -6,7 +6,11 @@
 
         이 튜토리얼은 SwiftUI, ARKit Image Tracking, RealityKit, AVPlayer, VideoMaterial을 한 흐름으로 연결합니다. 화면 준비 → 포스터 등록 → 인식 → 포털 배치 → 영상 재생 순서로, 딱 두 파일(`ContentView.swift`와 `ARViewContainer.swift`)만 조금씩 키워 갑니다.
 
-        **따라가는 방법.** 각 단계의 코드 블록은 바로 앞 단계의 코드 위에 몇 줄을 더한 것입니다. 초록색으로 표시된 줄만 새로 입력하면 되고, 지우는 줄은 없습니다. 처음부터 끝까지 위에서 아래로 따라가면 마지막 단계의 코드가 곧 완성된 `ARViewContainer.swift`입니다.
+        **따라가는 방법.** 각 단계의 코드 프리뷰는 전체 파일이 아니라 **이번 단계에서 추가·수정하는 주변 코드만** 보여 줍니다. `// ... (중략) ...`은 기존 코드를 지우라는 뜻이 아닙니다. 해당 함수나 프로퍼티의 앞뒤 뼈대를 확인한 뒤, 표시된 줄만 기존 파일의 알맞은 위치에 추가하세요. 마지막 완성본은 7번 섹션의 마지막 프리뷰에서 한 번만 전체로 확인합니다.
+
+        > Check Point: 코드 프리뷰에 `// ... (중략) ...`이 보이면 그 줄을 실제 파일에 입력하지 않습니다. 중략 표시는 설명을 짧게 하기 위한 자리표시자입니다. 매 단계가 끝날 때마다 Xcode의 빨간 오류 표시가 사라지는지 확인하고 다음 단계로 넘어가세요.
+
+        > 시각 자료 안내: Xcode의 메뉴·패널 배치는 Xcode 버전, macOS 설정, 창 크기에 따라 달라질 수 있습니다. 이 튜토리얼의 개념 설명용 SVG와 실제 결과 화면을 혼동하지 않도록, Xcode 조작 단계의 SVG는 **따라야 할 UI의 위치를 표시한 안내 그림**으로 표시합니다. 최종 배포 전에는 아래 캡처 목록의 실제 Xcode·기기 화면으로 교체해야 합니다.
 
         **예상 소요 시간:** Swift와 Xcode가 처음인 분 기준 약 60~90분입니다(기기 서명이 처음이면 조금 더 걸릴 수 있습니다).
 
@@ -42,8 +46,7 @@
 
                 - Xcode를 실행한 뒤 **Create New Project...**를 선택합니다.
                 - 플랫폼 탭에서 **iOS**를 고르고, Application 목록에서 **App**을 선택합니다. (**Augmented Reality App** 템플릿은 선택하지 않습니다 — 아래 설명 참고)
-                - **Next**를 누르고 Product Name에 `Movie Poster`를 입력합니다. Interface는 **SwiftUI**, Language는 **Swift**로 둡니다.
-                - 저장 위치를 고르고 **Create**를 누르면 프로젝트가 만들어집니다.
+                - **Next**를 누릅니다. 다음 화면에서 프로젝트 이름과 세부 옵션을 설정합니다.
 
                 **왜 'Augmented Reality App'이 아니라 'App' 템플릿인가요?** 'Augmented Reality App' 템플릿은 이 튜토리얼과 다른 구조(RealityView 기반 장면 등)를 자동으로 만들어 오히려 튜토리얼 코드와 맞지 않습니다. 이 튜토리얼은 SwiftUI 화면 위에 `ARView`를 직접 얹는 더 단순한 구조를 쓰므로 기본 **App** 템플릿으로 충분합니다.
 
@@ -51,7 +54,26 @@
 
                 📍 Xcode 프로젝트 자체를 만드는 단계라 아직 코드는 없습니다.
 
-                @Image(source: "xc-new-project-template.svg", alt: "Xcode 새 프로젝트 템플릿 화면. App이 선택돼 있고 Augmented Reality App에는 선택하지 말라는 표시가 있다")
+                @Image(source: "xc-new-project-template.png", alt: "실제 Xcode 새 프로젝트 템플릿 화면. iOS와 App이 선택돼 있다")
+            }
+
+            @Step {
+                **Choose options for your new project** 화면에서 프로젝트의 기본 정보를 설정합니다.
+
+                - **Product Name**에는 `Movie Poster`를 입력합니다. 이 이름이 프로젝트와 앱 이름으로 사용됩니다.
+                - **Team**은 지금 `None`으로 두어도 됩니다. 실제 기기에서 실행하기 전인 다음 단계에서 Apple ID Team을 설정합니다.
+                - **Organization Identifier**에는 역도메인 형식의 식별자를 입력합니다. 연습에서는 `com.example`처럼 입력하고, 실제 개발자 계정으로 배포할 프로젝트라면 본인이 관리하는 고유한 값(예: `com.yourname`)을 사용하세요. 다른 사람의 식별자를 그대로 복사하지 않습니다.
+                - **Bundle Identifier**는 Organization Identifier와 Product Name을 조합해 자동으로 만들어지므로 직접 수정하지 않습니다. 나중에 Team을 선택하면 Xcode가 서명에 사용할 앱 식별자와 연결합니다.
+                - **Interface**는 **SwiftUI**, **Language**는 **Swift**로 둡니다.
+                - **Testing System**과 **Storage**는 각각 **None**으로 둡니다. **Host in CloudKit**은 선택하지 않습니다.
+
+                설정을 확인한 뒤 **Next**를 누르고 저장 위치를 선택한 다음 **Create**를 누릅니다.
+
+                > Check Point: 이 화면에 보이는 `Team`, `Organization Identifier`, `Bundle Identifier`는 사람마다 다를 수 있습니다. 문서 이미지의 값을 그대로 복사하는 것이 아니라, 위 설명대로 자신의 프로젝트에 맞는 값을 입력하세요. 특히 `Bundle Identifier`가 회색으로 자동 생성되고 있는지 확인합니다.
+
+                📍 이 화면은 1번 스텝에서 **App**을 선택하고 **Next**를 눌렀을 때 나타납니다. 아래 프리뷰에서는 개인정보가 될 수 있는 식별자 값을 지워 두었습니다.
+
+                @Image(source: "xc-new-project-options.png", alt: "개인 식별자 값을 지운 Xcode 새 프로젝트 옵션 설정 화면")
             }
 
             @Step {
@@ -130,6 +152,8 @@
 
                 지금 빌드하면 검은 화면이나 카메라 영상만 보이는 게 정상입니다. 아직 포스터 인식 코드가 없기 때문입니다. (실행 대상은 Simulator가 아니라, 앞서 연결하고 서명해 둔 실제 기기를 선택하세요.)
 
+                > Check Point: 앱이 실행되지 않거나 `Signing` 오류가 나면 Team, Bundle Identifier, 연결된 기기를 먼저 확인하세요. 검은 화면만 보이는 것은 이 단계에서는 오류가 아닙니다.
+
                 📍 `ContentView.swift`의 `struct ContentView` 안, `var body: some View {` 다음 줄입니다.
 
                 @Code(name: "ContentView.swift", file: "cv.swift", reset: true) {
@@ -194,6 +218,8 @@
                 3. **실물 포스터가 있는 경우에만:** 그 포스터를 자로 재서 값을 입력합니다.
 
                 - **Height**는 Xcode가 비율로 자동 계산하므로 따로 입력하지 않습니다.
+
+                > 예상되는 오류: `AR Resources`가 코드의 문자열과 다르면 앱은 실행돼도 포스터를 인식하지 못합니다. 그룹 이름은 공백까지 정확히 `AR Resources`인지, 포스터가 그룹 안에 들어갔는지 확인하세요.
 
                 예시로 사용한 토이스토리 포스터도 A4 용지 기준인 `0.21 m`로 등록한 것입니다(위 2번과 같은 이유입니다).
 
@@ -324,6 +350,8 @@
 
                 지금 `makeUIView` 안 순서는 다음과 같습니다: `arView 생성 → Coordinator 연결 → 추적 설정 → delegate 연결 → 세션 실행 → return`.
 
+                > Check Point: `arView.session.run(...)`은 `arView.session.delegate = coordinator` **뒤**에 있어야 합니다. 순서가 바뀌면 첫 인식 이벤트를 놓칠 수 있습니다.
+
                 📍 `arView.session.delegate = coordinator` 다음 줄입니다.
 
                 @Code(name: "ARViewContainer.swift", file: "av-s3-4.swift", previousFile: "av-s3-3.swift") {
@@ -339,6 +367,8 @@
                 3. 값에 `AR 기능을 위해 카메라를 사용합니다`처럼 사용자에게 보여줄 문구를 적습니다.
 
                 이 설명이 없으면 앱이 카메라에 접근하는 순간 iOS가 앱을 강제 종료합니다.
+
+                > Check Point: 권한 문구를 추가한 뒤 앱을 다시 실행했을 때 카메라 권한 대화상자가 나타나야 합니다. 대화상자가 이미 거절된 상태라면 기기의 설정에서 Movie Poster의 카메라 권한을 다시 허용하세요.
 
                 📍 Xcode의 Info 탭에서 하는 프로젝트 설정입니다. 코드는 그대로입니다.
 
@@ -423,6 +453,8 @@
                 - 이어서 `break`로 반복문을 빠져나옵니다(포스터 한 장만 다루면 되니까요).
 
                 `createPortal`은 아직 없어서 지금 빌드하면 오류가 나는데, 정상입니다. 이 함수는 바로 다음 섹션에서 만듭니다.
+
+                > Check Point: 이 단계에서는 `createPortal`을 아직 추가하지 않았기 때문에 빨간 `Cannot find 'createPortal' in scope` 오류가 남습니다. 다음 섹션을 완료한 뒤 사라지는 오류이므로, 지금 다른 코드를 임의로 고치지 마세요.
 
                 📍 `print("포스터 인식 완료 …")` 다음 줄, 반복문 안입니다.
 
@@ -545,6 +577,8 @@
 
                 📍 네 벽 생성 코드 뒤, `arView.scene.addAnchor(anchorEntity)` 위입니다.
 
+                > Check Point: 포스터를 인식했는데 검은 사다리꼴이 보이지 않으면 `arView.scene.addAnchor(anchorEntity)`가 남아 있는지, 네 `addChild` 줄의 이름이 네 프레임 변수 이름과 같은지 확인하세요. 시뮬레이터에서는 이 결과를 확인할 수 없습니다.
+
                 @Code(name: "ARViewContainer.swift", file: "av-s5-6.swift", previousFile: "av-s5-5.swift") {
                     @Image(source: "05-portal-anchor.svg", alt: "네 벽을 앵커에 붙여 완성한 포털")
                 }
@@ -612,6 +646,8 @@
                 - 그 반대면 세로를 맞추고 가로를 줄입니다.
 
                 이렇게 하면 영상이 항상 포스터 안에 완전히 들어오고 절대 찌그러지지 않습니다. 남는 공간은 다음 섹션에서 검은 배경으로 채웁니다.
+
+                > 예상되는 오류: 세로 영상의 비율이 이상하면 영상 트랙의 `preferredTransform`을 반영하는 `videoAspectRatio(for:)` 도우미 함수까지 함께 추가했는지 확인하세요.
 
                 📍 `let screenWidth: Float` / `let screenHeight: Float` 선언 바로 아래, `createPortal` 함수 안입니다.
 
@@ -708,6 +744,8 @@
 
                 📍 `anchorEntity.addChild(videoEntity)` 줄 바로 위입니다. 완성된 전체 파일을 아래에서 확인하세요.
 
+                > Check Point: 영상이 검은 화면이면 `backgroundEntity`와 `videoEntity`의 위치가 뒤바뀌지 않았는지 확인하세요. 배경은 `-depth + 0.001`, 영상은 `-depth + 0.003`이어야 합니다.
+
                 @Code(name: "ARViewContainer.swift", file: "av-s7-4.swift", previousFile: "av-s7-3.swift") {
                     @Image(source: "07-layer-order.svg", alt: "완성된 ARViewContainer.swift")
                 }
@@ -777,6 +815,10 @@
                 - 소리만 나고 화면이 검다 → `VideoMaterial`이 영상 면에 제대로 들어갔는지 확인합니다.
                 - 영상이 아예 안 나온다 → 파일 이름·확장자와 Target Membership을 확인합니다.
                 - 포털 크기가 이상하다 → 포스터의 Width 값을 더 작게(또는 크게) 조정해봅니다.
+
+                > 최종 검증 체크리스트: (1) 실제 기기에서만 테스트했는가, (2) 포스터 전체가 카메라에 들어오는가, (3) `AR Resources` 이름과 Width가 맞는가, (4) 영상 파일의 Target Membership이 켜져 있는가, (5) 포털이 포스터의 기울기와 함께 움직이는가를 순서대로 확인하세요.
+
+                > 실제 캡처 교체 목록: 최종 배포본에는 `capture-01-project-template.png`(새 프로젝트 템플릿), `capture-02-signing.png`(Signing & Capabilities), `capture-03-video-target-membership.png`(영상 Target Membership), `capture-04-ar-resources.png`(AR Resources와 포스터), `capture-05-physical-size.png`(Width/Height), `capture-06-camera-permission.png`(Info), `capture-07-device-run.png`(실제 기기 실행), `capture-08-recognition.png`(포스터 인식 결과), `capture-09-console-log.png`(인식 로그), `capture-10-final-portal.png`(최종 앱 화면)이 필요합니다. 각 캡처는 설명에 적힌 Xcode 버전과 같은 버전에서, 튜토리얼의 예시 파일명·포스터·Width를 그대로 사용해 촬영하세요.
 
                 📍 최종 확인 단계입니다. 완성입니다. 🎬
 
