@@ -209,7 +209,7 @@
             }
 
             @Step {
-                방금 추가한 포스터 리소스를 클릭하고 오른쪽 **File Inspector**를 엽니다.
+                방금 추가한 포스터 리소스를 클릭합니다. 그러면 오른쪽에 **AR Reference Image** 인스펙터가 나타납니다. 별도로 File Inspector 탭을 찾을 필요는 없습니다.
 
                 **Width** 칸에는 이 포스터가 실제 세계에서 어느 정도 크기로 놓일지를 미터 단위로 입력합니다.
 
@@ -234,7 +234,7 @@
 
                 📍 인스펙터의 Width 칸 하나만 수정합니다. 코드 변경은 없습니다.
 
-                @Image(source: "xc-file-inspector-width.svg", alt: "File Inspector의 Physical Size 항목에서 Width 칸에 값을 입력하는 화면")
+                @Image(source: "xc-ar-reference-image-inspector.svg", alt: "Xcode에서 AR Reference Image를 선택했을 때 오른쪽에 표시되는 AR Reference Image 인스펙터 화면")
             }
 
             @Step {
