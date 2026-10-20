@@ -829,8 +829,6 @@
 
                 > 최종 검증 체크리스트: (1) 실제 기기에서만 테스트했는가, (2) 포스터 전체가 카메라에 들어오는가, (3) `AR Resources` 이름과 Width가 맞는가, (4) 영상 파일의 Target Membership이 켜져 있는가, (5) 포털이 포스터의 기울기와 함께 움직이는가를 순서대로 확인하세요.
 
-                > 실제 캡처 교체 목록: 최종 배포본에는 `capture-01-project-template.png`(새 프로젝트 템플릿), `capture-02-signing.png`(Signing & Capabilities), `capture-03-video-target-membership.png`(영상 Target Membership), `capture-04-ar-resources.png`(AR Resources와 포스터), `capture-05-physical-size.png`(Width/Height), `capture-06-camera-permission.png`(Info), `capture-07-device-run.png`(실제 기기 실행), `capture-08-recognition.png`(포스터 인식 결과), `capture-09-console-log.png`(인식 로그), `capture-10-final-portal.png`(최종 앱 화면)이 필요합니다. 각 캡처는 설명에 적힌 Xcode 버전과 같은 버전에서, 튜토리얼의 예시 파일명·포스터·Width를 그대로 사용해 촬영하세요.
-
                 📍 최종 확인 단계입니다. 완성입니다. 🎬
 
                 @Video(source: "toy-story.mov", poster: "toy-story-poster.jpeg", alt: "토이스토리 포스터를 인식한 뒤 재생되는 영화 예고편")
